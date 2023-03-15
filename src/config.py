@@ -8,14 +8,14 @@ ROOT_PATH = str(pathlib.Path(__file__).parent.parent.parent)
 
 class Settings(BaseSettings):
     # for main db
-    POSTGRES_USER: str = Field(..., env="POSTGRES_USER")
+    POSTGRES_USER: str = Field(default='postgres', env="POSTGRES_USER")
     POSTGRES_PASSWORD: str = Field(..., env="POSTGRES_PASSWORD")
-    POSTGRES_HOST: str = Field(..., env="POSTGRES_HOST")
-    POSTGRES_PORT: str = Field(..., env="POSTGRES_PORT")
-    POSTGRES_DB: str = Field(..., env="POSTGRES_DB")
+    POSTGRES_HOST: str = Field(default='localhost', env="POSTGRES_HOST")
+    POSTGRES_PORT: int = Field(default=5433, env="POSTGRES_PORT")
+    POSTGRES_DB: str = Field(default='postgres', env="POSTGRES_DB")
     # for api
-    FAST_API_HOST: str = Field(..., env="FAST_API_HOST")
-    FAST_API_PORT: int = Field(..., env="FAST_API_PORT")
+    FAST_API_HOST: str = Field(default='localhost', env="FAST_API_HOST")
+    FAST_API_PORT: int = Field(default=8080, env="FAST_API_PORT")
     # api auth settings
     AUTH_SECRET_KEY: str = Field(..., env="AUTH_SECRET_KEY")
     ALGORITHM: str = Field(default="HS256", env="ALGORITHM")
