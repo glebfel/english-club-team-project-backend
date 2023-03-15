@@ -10,17 +10,18 @@ from src.auth.schemas import Token
 from src.db import models
 from src.db.connector import get_db
 from src.db.models import User
+from src.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-router = APIRouter()
+router = APIRouter(tags=["auth"], prefix='/auth')
 
 
 async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> User:
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.AUTH_SECRET_KEY, algorithms=[settings.ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
             raise HTTPException(
@@ -66,7 +67,7 @@ def create_access_token(data: dict, expires_delta: timedelta) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.AUTH_SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
 
@@ -80,7 +81,7 @@ def register_user(user: User, db: Session = Depends(get_db)) -> Token:
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": db_user.email, "name": db_user.name, "is_admin": db_user.is_admin},
         expires_delta=access_token_expires
@@ -88,12 +89,12 @@ def register_user(user: User, db: Session = Depends(get_db)) -> Token:
     return Token(access_token=access_token, token_type='bearer', expire=datetime.utcnow() + access_token_expires)
 
 
-@router.post("/token")
+@router.post("/login")
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)) -> Token:
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.email, "name": user.name, "is_admin": user.is_admin},
         expires_delta=access_token_expires
@@ -101,6 +102,6 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     return Token(access_token=access_token, token_type='bearer', expire=datetime.utcnow() + access_token_expires)
 
 
-@router.get("/users/me")
+@router.get("/me")
 def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
