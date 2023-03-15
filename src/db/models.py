@@ -10,17 +10,17 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    email = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, index=True, nullable=False)
     name = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False)
 
-    camps = relationship("UserCamp", back_populates="user")
-    achievements = relationship("UserAchievement", back_populates="user")
-    task_responses = relationship("TaskResponse", back_populates="user")
+    shifts = relationship("UserShift")
+    achievements = relationship("UserAchievement")
+    task_responses = relationship("TaskResponse")
 
 
-class UserShifts(Base):
+class UserShift(Base):
     __tablename__ = "user_shifts"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -39,7 +39,7 @@ class Shift(Base):
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
 
-    users = relationship("UserShifts", back_populates="user_shifts")
+    users = relationship("UserShift")
 
 
 class UserAchievement(Base):
@@ -60,7 +60,7 @@ class Achievement(Base):
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
 
-    users = relationship("UserAchievement", back_populates="user_achievements")
+    users = relationship("UserAchievement")
 
 
 class Task(Base):
@@ -83,8 +83,8 @@ class TaskResponse(Base):
     response = Column(String, nullable=False)
     response_time = Column(DateTime, server_default=func.now())
 
-    user = relationship("User", back_populates="users")
-    task = relationship("Task", back_populates="responses")
+    user = relationship("User")
+    task = relationship("Task")
 
 
 class ShiftReservation(Base):
