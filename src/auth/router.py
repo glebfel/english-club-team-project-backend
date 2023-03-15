@@ -4,11 +4,9 @@ import jwt
 from fastapi import HTTPException, Depends, APIRouter, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
-from sqlalchemy.orm import Session
 
 from src.auth.schemas import Token
 from src.config import settings
-from src.db.connector import get_db
 from src.db.crud.users import get_user_by_email, add_new_user
 from src.db.models import User
 
@@ -19,7 +17,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 router = APIRouter(tags=["auth"], prefix='/auth')
 
 
-async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> User:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     try:
         payload = jwt.decode(token, settings.AUTH_SECRET_KEY, algorithms=[settings.ALGORITHM])
         email: str = payload.get("sub")
@@ -36,7 +34,7 @@ async def get_current_user(db: Session = Depends(get_db), token: str = Depends(o
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    user = get_user_by_email(db, email)
+    user = get_user_by_email(email)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user
