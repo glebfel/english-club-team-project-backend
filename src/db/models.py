@@ -21,26 +21,26 @@ class User(Base):
     task_responses = relationship("TaskResponse", back_populates="user")
 
 
-class UserCamp(Base):
-    __tablename__ = "user_camps"
+class UserShifts(Base):
+    __tablename__ = "user_shifts"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    camp_id = Column(Integer, ForeignKey("camps.id"))
+    camp_id = Column(Integer, ForeignKey("shifts.id"))
 
-    user = relationship("User", back_populates="camps")
-    camp = relationship("Camp", back_populates="users")
+    user = relationship("User", back_populates="shifts")
+    camp = relationship("Shift", back_populates="users")
 
 
-class Camp(Base):
-    __tablename__ = "camps"
+class Shift(Base):
+    __tablename__ = "shifts"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
 
-    users = relationship("UserCamp", back_populates="camp")
+    users = relationship("UserShifts", back_populates="user_shifts")
 
 
 class UserAchievement(Base):
@@ -61,7 +61,7 @@ class Achievement(Base):
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
 
-    users = relationship("UserAchievement", back_populates="achievement")
+    users = relationship("UserAchievement", back_populates="user_achievements")
 
 
 class Task(Base):
@@ -70,6 +70,7 @@ class Task(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
+    status = Column(Boolean, default=False)
 
     responses = relationship("TaskResponse", back_populates="task")
 
@@ -83,8 +84,21 @@ class TaskResponse(Base):
     response = Column(String, nullable=False)
     response_time = Column(DateTime, server_default=func.now())
 
-    user = relationship("User", back_populates="task_responses")
+    user = relationship("User", back_populates="users")
     task = relationship("Task", back_populates="responses")
+
+
+class ShiftReservation(Base):
+    __tablename__ = "shift_reservations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    shift_id = Column(Integer, ForeignKey("shifts.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, server_default=func.now())
+    approved = Column(Boolean, default=False)
+
+    shift = relationship("Shift")
+    user = relationship("User")
 
 
 class News(Base):
