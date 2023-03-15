@@ -71,7 +71,7 @@ def register_user(user: User) -> Token:
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     user.hashed_password = get_password_hash(user.password)
-    await add_new_user(user=user)
+    add_new_user(user=user)
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": db_user.email, "name": db_user.name, "is_admin": db_user.is_admin},
