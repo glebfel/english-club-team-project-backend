@@ -41,19 +41,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInfo:
                     is_admin=user.is_admin, access_token=Token(access_token=token, expire=expire, token_type='Bearer'))
 
 
-def verify_password(plain_password, hashed_password) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password) -> str:
-    return pwd_context.hash(password)
-
-
 def authenticate_user(email: str, password: str) -> User | None:
     user = get_user_by_email(email)
     if not user:
         return None
-    if not verify_password(password, user.hashed_password):
+    if not User.verify_password(password, user.hashed_password):
         return None
     return user
 
@@ -71,7 +63,7 @@ def register_user(user: UserRegister) -> Token:
     db_user = get_user_by_email(email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    add_new_user(User(name=user.name, email=user.email, hashed_password=get_password_hash(user.password)))
+    add_new_user(name=user.name, email=user.email, password=user.password)
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"email": db_user.email, "name": db_user.name,
