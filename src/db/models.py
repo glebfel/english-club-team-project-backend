@@ -9,11 +9,10 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
-    is_active = Column(Boolean, default=True)
     is_admin = Column(Boolean, default=False)
 
     camps = relationship("UserCamp", back_populates="user")
@@ -24,7 +23,7 @@ class User(Base):
 class UserShifts(Base):
     __tablename__ = "user_shifts"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     camp_id = Column(Integer, ForeignKey("shifts.id"))
 
@@ -35,7 +34,7 @@ class UserShifts(Base):
 class Shift(Base):
     __tablename__ = "shifts"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
@@ -46,7 +45,7 @@ class Shift(Base):
 class UserAchievement(Base):
     __tablename__ = "user_achievements"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     achievement_id = Column(Integer, ForeignKey("achievements.id"))
 
@@ -57,7 +56,7 @@ class UserAchievement(Base):
 class Achievement(Base):
     __tablename__ = "achievements"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
 
@@ -67,7 +66,7 @@ class Achievement(Base):
 class Task(Base):
     __tablename__ = "tasks"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
     status = Column(Boolean, default=False)
@@ -78,7 +77,7 @@ class Task(Base):
 class TaskResponse(Base):
     __tablename__ = "task_responses"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     task_id = Column(Integer, ForeignKey("tasks.id"))
     response = Column(String, nullable=False)
@@ -91,7 +90,7 @@ class TaskResponse(Base):
 class ShiftReservation(Base):
     __tablename__ = "shift_reservations"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     shift_id = Column(Integer, ForeignKey("shifts.id"))
     user_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime, server_default=func.now())
@@ -104,7 +103,7 @@ class ShiftReservation(Base):
 class News(Base):
     __tablename__ = "news"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     content = Column(String, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
