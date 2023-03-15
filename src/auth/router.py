@@ -1,16 +1,16 @@
+from datetime import datetime, timedelta
+
+import jwt
 from fastapi import HTTPException, Depends, APIRouter, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
-import jwt
-from datetime import datetime, timedelta
-
 from sqlalchemy.orm import Session
 
 from src.auth.schemas import Token
-from src.db import models
-from src.db.connector import get_db
-from src.db.models import User
 from src.config import settings
+from src.db.connector import get_db
+from src.db.crud.users import get_user_by_email, add_new_user
+from src.db.models import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -50,12 +50,8 @@ def get_password_hash(password) -> str:
     return pwd_context.hash(password)
 
 
-def get_user_by_email(db, email: str) -> User:
-    return db.query(models.User).filter(models.User.email == email).first()
-
-
-def authenticate_user(db, email: str, password: str):
-    user = get_user_by_email(db, email)
+def authenticate_user(email: str, password: str):
+    user = get_user_by_email(email)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -72,15 +68,12 @@ def create_access_token(data: dict, expires_delta: timedelta) -> str:
 
 
 @router.post("/register")
-def register_user(user: User, db: Session = Depends(get_db)) -> Token:
-    db_user = get_user_by_email(db, email=user.email)
+def register_user(user: User) -> Token:
+    db_user = get_user_by_email(email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    hashed_password = get_password_hash(user.password)
-    db_user = models.User(email=user.email, name=user.name, hashed_password=hashed_password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+    user.hashed_password = get_password_hash(user.password)
+    await add_new_user(user=user)
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": db_user.email, "name": db_user.name, "is_admin": db_user.is_admin},
@@ -90,8 +83,8 @@ def register_user(user: User, db: Session = Depends(get_db)) -> Token:
 
 
 @router.post("/login")
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)) -> Token:
-    user = authenticate_user(db, form_data.username, form_data.password)
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
+    user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
