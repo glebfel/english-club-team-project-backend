@@ -24,6 +24,12 @@ def add_new_user(first_name: str, last_name,
         session.refresh(user)
 
 
+def update_user_by_phone_number(phone_number: str, **kwargs):
+    with get_db() as session:
+        session.query(User).filter_by(phone_number=phone_number).update(kwargs)
+        session.commit()
+
+
 def remove_user_by_phone_number(phone_number: str):
     with get_db() as session:
         session.query(User).filter_by(phone_number=phone_number).delete()
