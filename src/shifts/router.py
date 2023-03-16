@@ -24,7 +24,7 @@ def get_shift_info(shift_id: int) -> Shift | None:
 
 
 @router.get("/my")
-def get_my_shifts(current_user: UserInfo = Depends(get_current_user)) -> [Shift]:
+def get_my_shifts(current_user: UserInfo = Depends(get_current_user)) -> list[Shift]:
     return [Shift(**shift.dict()) for shift in get_user_shifts_by_email(current_user.email)]
 
 
