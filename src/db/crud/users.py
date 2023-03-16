@@ -7,9 +7,9 @@ def get_user_by_email(email: str) -> User:
         return session.query(User).filter_by(email=email).first()
 
 
-def add_new_user(name, email, password, admin=False):
+def add_new_user(name: str, email: str, hashed_password: str, admin=False):
     with get_db() as session:
-        user = User(name=name, email=email, hashed_password=User.get_password_hash(password), is_admin=admin)
+        user = User(name=name, email=email, hashed_password=hashed_password, is_admin=admin)
         user.is_admin = admin
         session.add(user)
         session.commit()
