@@ -10,4 +10,4 @@ class NewsItem(BaseModel):
 
 
 class NewsList(BaseModel):
-    news: list[NewsItem]
+    news: list[NewsItem] = Field(default_factory=list)
