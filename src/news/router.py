@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 
 from src.auth.dependencies import oauth2_scheme
 from src.db.crud.news import get_news as get_news_db, add_news as add_news_db
+from src.news.dependencies import check_user_status
 from src.news.schemas import NewsList, NewsItem
 
 router = APIRouter(tags=["news"], prefix='/news')
@@ -12,6 +13,6 @@ def get_all_news() -> NewsList:
     return NewsList(news=[NewsItem(title=i.title, content=i.content) for i in get_news_db()])
 
 
-@router.post("/add", dependencies=[Depends(oauth2_scheme)])
+@router.post("/add", dependencies=[Depends(check_user_status)])
 def add_news(news: NewsItem):
     add_news_db(news.title, news.content)
