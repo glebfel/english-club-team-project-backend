@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, EmailStr, HttpUrl
 
 
 class UserInfo(BaseModel):
+    id: int
     first_name: str = Field(max_length=30)
     last_name: str = Field(max_length=30)
     username: str = Field(max_length=30)
