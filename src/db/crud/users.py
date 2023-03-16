@@ -9,6 +9,11 @@ def get_user_by_phone_number(phone_number: str) -> User:
         return session.query(User).filter_by(phone_number=phone_number).first()
 
 
+def get_all_users() -> list[User]:
+    with get_db() as session:
+        return session.query(User).all()
+
+
 def add_new_user(first_name: str, last_name,
                  email: str, username: str,
                  phone_number: str, birthday: datetime,

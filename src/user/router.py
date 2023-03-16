@@ -15,6 +15,12 @@ def get_user_info(phone_number: str) -> UserInfo:
     return UserInfo(**user.dict())
 
 
+@user_router.get("/all", dependencies=[Depends(check_user_status)])
+def get_all_users_info() -> list[UserInfo]:
+    """Get all users info (required admin permission)"""
+    return [UserInfo(**user.dict()) for user in get_all_users_info()]
+
+
 @user_router.get("/me")
 def get_me_info(current_user: UserInfo = Depends(get_current_user)) -> UserInfo:
     """Get current user info"""
