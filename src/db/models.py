@@ -3,6 +3,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from sqlalchemy.ext.declarative import declarative_base
 
+from src.auth.router import pwd_context
+
 Base = declarative_base()
 
 
@@ -18,6 +20,14 @@ class User(Base):
     shifts = relationship("UserShift")
     achievements = relationship("UserAchievement")
     task_responses = relationship("TaskResponse")
+
+    @staticmethod
+    def verify_password(plain_password, hashed_password) -> bool:
+        return pwd_context.verify(plain_password, hashed_password)
+
+    @staticmethod
+    def get_password_hash(password) -> str:
+        return pwd_context.hash(password)
 
 
 class UserShift(Base):
