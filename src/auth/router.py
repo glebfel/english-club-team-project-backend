@@ -46,7 +46,7 @@ def register_user(user: UserRegister) -> Token:
     db_user = get_user_by_email(email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    add_new_user(name=user.name, email=user.email, hashed_password=get_password_hash(user.password))
+    add_new_user(name=user.name, email=user.email, hashed_password=get_password_hash(user.password), admin=user.is_admin)
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"email": user.email, "name": user.name,
