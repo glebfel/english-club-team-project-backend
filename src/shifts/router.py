@@ -2,9 +2,8 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from src.auth.dependencies import get_current_user
+from src.auth.dependencies import get_current_user, check_user_status
 from src.db.crud.shifts import get_all_shifts, get_shift_by_id, add_shift as add_shift_db
-from src.news.dependencies import check_user_status
 from src.shifts.schemas import Shift
 
 router = APIRouter(tags=["shifts"], prefix='/shifts')
