@@ -8,7 +8,7 @@ from src.db.crud.shifts import get_all_shifts, get_shift_by_id, \
     add_shift as add_shift_db, get_user_shifts_by_email
 from src.shifts.schemas import Shift
 
-router = APIRouter(tags=["shifts"], prefix='/shifts')
+router = APIRouter(tags=["Shifts"], prefix='/shifts')
 
 
 @router.get("/upcoming", dependencies=[Depends(get_current_user)])

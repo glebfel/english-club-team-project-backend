@@ -13,7 +13,7 @@ from src.db.models import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-router = APIRouter(tags=["auth"], prefix='/auth')
+router = APIRouter(tags=["Authentication"], prefix='/auth')
 
 
 def verify_password(plain_password, hashed_password) -> bool:
