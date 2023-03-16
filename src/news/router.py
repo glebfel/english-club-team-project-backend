@@ -1,17 +1,17 @@
 from fastapi import APIRouter, Depends
 
-from src.auth.router import get_current_user
-from src.db.crud.news import get_news
+from src.auth.dependencies import oauth2_scheme
+from src.db.crud.news import get_news as get_news_db, add_news as add_news_db
 from src.news.schemas import NewsList, NewsItem
 
 router = APIRouter(tags=["news"], prefix='/news')
 
 
-@router.get("/all", dependencies=[Depends(get_current_user)])
+@router.get("/all", dependencies=[Depends(oauth2_scheme)])
 def get_all_news() -> NewsList:
-    return get_news()
+    return NewsList(news=[NewsItem(title=i.title, content=i.content) for i in get_news_db()])
 
 
-@router.post("/add", dependencies=[Depends(get_current_user)])
+@router.post("/add", dependencies=[Depends(oauth2_scheme)])
 def add_news(news: NewsItem):
-    add_news(news.title, news.content)
+    add_news_db(news.title, news.content)
