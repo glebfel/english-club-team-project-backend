@@ -25,7 +25,7 @@ class UserShift(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    camp_id = Column(Integer, ForeignKey("shifts.id"))
+    shift_id = Column(Integer, ForeignKey("shifts.id"))
 
     user = relationship("User", back_populates="shifts")
     camp = relationship("Shift", back_populates="users")
