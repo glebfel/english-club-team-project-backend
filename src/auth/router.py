@@ -11,7 +11,7 @@ from src.db.models import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-router = APIRouter(tags=["Authentication"], prefix='/auth')
+auth_router = APIRouter(tags=["Authentication"], prefix='/auth')
 
 
 def verify_password(plain_password, hashed_password) -> bool:
@@ -39,7 +39,7 @@ def create_access_token(data: dict, expires_delta: timedelta) -> str:
     return encoded_jwt
 
 
-@router.post("/register")
+@auth_router.post("/register")
 def register_user(user: UserRegister) -> Token:
     db_user = get_user_by_phone_number(phone_number=user.phone_number)
     if db_user:
@@ -58,7 +58,7 @@ def register_user(user: UserRegister) -> Token:
     return Token(access_token=access_token, token_type='bearer', expire=datetime.utcnow() + access_token_expires)
 
 
-@router.post("/login")
+@auth_router.post("/login")
 def login_for_access_token(form_data: UserLogin = Depends()) -> Token:
     user = authenticate_user(form_data.phone_number, form_data.password)
     if not user:
