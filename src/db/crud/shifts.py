@@ -2,7 +2,7 @@ from datetime import datetime
 
 from db.crud.users import get_user_by_phone_number
 from src.db.connector import get_db
-from src.db.models import Shift, UserShift
+from src.db.models import Shift, UserShift, ShiftReservation
 
 
 def add_shift(name: str, start_date: datetime, end_date: datetime):
@@ -32,6 +32,24 @@ def get_user_shifts_by_phone_number(phone_number: str) -> list[Shift]:
         # extract info about each shift
         shifts = session.query(Shift).filter(Shift.id.in_(shifts_ids)).all()
         return shifts
+
+
+def reserve_shift(shift_id: int, user_id: int):
+    with get_db() as session:
+        reservation = ShiftReservation(shift_id=shift_id, user_id=user_id)
+        session.add(reservation)
+        session.commit()
+        session.refresh(reservation)
+
+
+def approve_shift_reservation(shift_reservation_id: int):
+    with get_db() as session:
+        # update approve status
+        session.query(ShiftReservation).filter_by(id=shift_reservation_id).update({'is_approved': True})
+        # update shift participant count
+        shift_id = session.query(ShiftReservation).filter_by(id=shift_reservation_id).first().shift_id
+        session.query(Shift).filter_by(id=shift_id).update({'participant_count': Shift.participant_count + 1})
+        session.commit()
 
 
 def remove_shift(shift_id: int):
