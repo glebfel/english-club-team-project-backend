@@ -10,3 +10,9 @@ class Shift(BaseModel):
     start_date: datetime
     end_date: datetime
 
+
+class ShiftReservation(BaseModel):
+    id: int
+    shift_id: int
+    user_id: int
+    is_approved: bool

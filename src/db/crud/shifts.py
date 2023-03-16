@@ -52,6 +52,13 @@ def approve_shift_reservation(shift_reservation_id: int):
         session.commit()
 
 
+def get_shifts_reservations() -> list[ShiftReservation]:
+    with get_db() as session:
+        # update shift participant count
+        shifts_reservations = session.query(ShiftReservation).all()
+        return shifts_reservations
+
+
 def remove_shift(shift_id: int):
     with get_db() as session:
         session.query(Shift).filter_by(id=shift_id).delete()

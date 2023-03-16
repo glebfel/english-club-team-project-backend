@@ -5,8 +5,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from src.auth.dependencies import get_current_user, check_user_status
 from src.db.crud.shifts import get_all_shifts, get_shift_by_id, \
     add_shift as add_shift_db, get_user_shifts_by_phone_number, \
-    approve_shift_reservation as approve_shift_reservation_db, reserve_shift as reserve_shift_db
-from src.shifts.schemas import Shift
+    approve_shift_reservation as approve_shift_reservation_db, reserve_shift as reserve_shift_db, \
+    get_shifts_reservations
+from src.shifts.schemas import Shift, ShiftReservation
 from user.schemas import UserInfo
 
 shifts_router = APIRouter(tags=["Shifts"], prefix='/shifts')
@@ -44,6 +45,12 @@ def reserve_shift(shift_id: int, current_user: UserInfo = Depends(get_current_us
     """Reserve shift """
     reserve_shift_db(shift_id=shift_id, user_id=current_user.id)
     return {'status': 'success', 'message': 'Shift added'}
+
+
+@shifts_router.post("/reservations")
+def show_shift_reservations():
+    """Show all shifts reservations (required admin permission)"""
+    return [ShiftReservation(**reservation.dict()) for reservation in get_shifts_reservations()]
 
 
 @shifts_router.post("/approve", dependencies=[Depends(check_user_status)])
