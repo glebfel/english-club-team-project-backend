@@ -48,7 +48,7 @@ def reserve_shift(shift_id: int, current_user: UserInfo = Depends(get_current_us
 
 
 @shifts_router.get("/reservations")
-def show_shift_reservations():
+def show_shift_reservations() -> list[ShiftReservation]:
     """Show all shifts reservations (required admin permission)"""
     return [ShiftReservation(**reservation.dict()) for reservation in get_shifts_reservations()]
 
