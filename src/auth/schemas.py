@@ -34,7 +34,7 @@ class UserInfo(BaseModel):
     email: EmailStr
     experience: int = Field(default=None)
     rank: str = Field(default=None)
-    hobby: str = Field(max_length=30)
+    hobby: str = Field(default=None)
     media_link: HttpUrl = Field(default=None)
     is_admin: bool = Field(default=False)
     access_token: Token

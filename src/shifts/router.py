@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from auth.schemas import UserInfo
 from src.auth.dependencies import get_current_user, check_user_status
 from src.db.crud.shifts import get_all_shifts, get_shift_by_id, \
-    add_shift as add_shift_db, get_user_shifts_by_email
+    add_shift as add_shift_db, get_user_shifts_by_phone_number
 from src.shifts.schemas import Shift
 
 router = APIRouter(tags=["Shifts"], prefix='/shifts')
@@ -25,7 +25,7 @@ def get_shift_info(shift_id: int) -> Shift | None:
 
 @router.get("/my")
 def get_my_shifts(current_user: UserInfo = Depends(get_current_user)) -> list[Shift]:
-    return [Shift(**shift.dict()) for shift in get_user_shifts_by_email(current_user.email)]
+    return [Shift(**shift.dict()) for shift in get_user_shifts_by_phone_number(current_user.phone_number)]
 
 
 @router.post("/add", dependencies=[Depends(check_user_status)])

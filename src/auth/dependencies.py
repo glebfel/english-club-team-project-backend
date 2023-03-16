@@ -4,9 +4,9 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
+from db.crud.users import get_user_by_phone_number
 from src.auth.schemas import UserInfo, Token
 from src.config import settings
-from src.db.crud.users import get_user_by_email
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", scheme_name="JWT")
 
@@ -28,10 +28,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInfo:
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    user = get_user_by_email(email)
+    user = get_user_by_phone_number(email)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return UserInfo(name=user.name, email=user.email,
+    return UserInfo(first_name=user.first_name, last_name=user.last_name,
+                    birthday=user.birthday, email=user.email, username=user.username, phone_number=user.phone_number,
                     is_admin=user.is_admin, access_token=Token(access_token=token, expire=expire, token_type='Bearer'))
 
 
