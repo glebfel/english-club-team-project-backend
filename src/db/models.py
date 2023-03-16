@@ -14,7 +14,7 @@ class User(Base):
     phone_number = Column(String, unique=True, nullable=False)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
-    username = Column(String, unique=True, nullable=False)
+    username = Column(String, nullable=False)
     birthday = Column(DateTime, nullable=True)
     experience = Column(Integer, nullable=True)
     rank = Column(String, nullable=True)
