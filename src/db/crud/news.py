@@ -15,7 +15,7 @@ def get_news_by_id(news_id: int) -> News | None:
         return session.query(News).filter_by(id=news_id).first()
 
 
-def get_news() -> [News]:
+def get_news() -> list[News]:
     with get_db() as session:
         return session.query(News).all()
 
