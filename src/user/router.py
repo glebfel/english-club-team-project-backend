@@ -27,7 +27,7 @@ def get_me_info(current_user: UserInfo = Depends(get_current_user)) -> UserInfo:
     return current_user
 
 
-@user_router.put("/update")
+@user_router.put("/update-me")
 def update_my_info(user_info: UpdateInfo, current_user: UserInfo = Depends(get_current_user)):
     """Update current user info"""
     updatable_fields = {}
@@ -35,4 +35,15 @@ def update_my_info(user_info: UpdateInfo, current_user: UserInfo = Depends(get_c
         if user_info.dict()[i]:
             updatable_fields.update({i: user_info.dict()[i]})
     update_user_by_phone_number(current_user.phone_number, **updatable_fields)
+    return {'status': 'success', 'message': 'User info updated'}
+
+
+@user_router.put("/update", dependencies=[Depends(check_user_status)])
+def update_user(phone_number: str, user_info: UpdateInfo):
+    """Update user info by phone number (required admin permission)"""
+    updatable_fields = {}
+    for i in user_info.dict():
+        if user_info.dict()[i]:
+            updatable_fields.update({i: user_info.dict()[i]})
+    update_user_by_phone_number(phone_number, **updatable_fields)
     return {'status': 'success', 'message': 'User info updated'}
