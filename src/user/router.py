@@ -21,7 +21,7 @@ def get_me_info(current_user: UserInfo = Depends(get_current_user)) -> UserInfo:
     return current_user
 
 
-@user_router.post("/update")
+@user_router.put("/update")
 def update_my_info(user_info: UpdateInfo, current_user: UserInfo = Depends(get_current_user)):
     """Update current user info"""
     updatable_fields = {}

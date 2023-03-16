@@ -47,13 +47,13 @@ def reserve_shift(shift_id: int, current_user: UserInfo = Depends(get_current_us
     return {'status': 'success', 'message': 'Shift added'}
 
 
-@shifts_router.post("/reservations")
+@shifts_router.get("/reservations")
 def show_shift_reservations():
     """Show all shifts reservations (required admin permission)"""
     return [ShiftReservation(**reservation.dict()) for reservation in get_shifts_reservations()]
 
 
-@shifts_router.post("/approve", dependencies=[Depends(check_user_status)])
+@shifts_router.put("/approve", dependencies=[Depends(check_user_status)])
 def approve_shift_reservation(shift_reservation_id: int, ):
     """Approve shift reservation (required admin permission)"""
     approve_shift_reservation_db(shift_reservation_id=shift_reservation_id)
