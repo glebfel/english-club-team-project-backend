@@ -51,6 +51,19 @@ class Shift(Base):
     users = relationship("UserShift")
 
 
+class ShiftReservation(Base):
+    __tablename__ = "shift_reservations"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    shift_id = Column(Integer, ForeignKey("shifts.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, server_default=func.now())
+    approved = Column(Boolean, default=False)
+
+    shift = relationship("Shift")
+    user = relationship("User")
+
+
 class UserAchievement(Base):
     __tablename__ = "user_achievements"
 
@@ -78,6 +91,11 @@ class Task(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
+    author = Column(String, nullable=False)
+    requirements = Column(String, nullable=False)
+    score = Column(Integer, nullable=False)
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=False)
     status = Column(Boolean, default=False)
 
     responses = relationship("TaskResponse", back_populates="task")
@@ -94,19 +112,6 @@ class TaskResponse(Base):
 
     user = relationship("User")
     task = relationship("Task")
-
-
-class ShiftReservation(Base):
-    __tablename__ = "shift_reservations"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    shift_id = Column(Integer, ForeignKey("shifts.id"))
-    user_id = Column(Integer, ForeignKey("users.id"))
-    created_at = Column(DateTime, server_default=func.now())
-    approved = Column(Boolean, default=False)
-
-    shift = relationship("Shift")
-    user = relationship("User")
 
 
 class News(Base):
