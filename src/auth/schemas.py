@@ -2,8 +2,6 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, EmailStr, HttpUrl
 
-from shifts.schemas import Shift
-
 
 class Token(BaseModel):
     access_token: str
@@ -34,7 +32,6 @@ class UserInfo(BaseModel):
     birthday: datetime
     phone_number: str
     email: EmailStr
-    first_shift: Shift = Field(default=None)
     experience: int = Field(default=None)
     rank: str = Field(default=None)
     hobby: str = Field(max_length=30)

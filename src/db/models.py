@@ -10,8 +10,15 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    email = Column(String, unique=True, nullable=False)
+    email = Column(String, nullable=False)
+    phone_number = Column(String, unique=True, nullable=False)
     name = Column(String, nullable=False)
+    username = Column(String, unique=True, nullable=False)
+    birthday = Column(DateTime, nullable=True)
+    experience = Column(Integer, nullable=True)
+    rank = Column(String, nullable=True)
+    hobby = Column(String, nullable=True)
+    media_link = Column(String, nullable=True)
     hashed_password = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False)
 
