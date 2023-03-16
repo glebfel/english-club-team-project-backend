@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from src.db.connector import get_db
-from src.db.models import Shift
+from src.db.models import Shift, UserShift
 
 
 def add_shift(name: str, start_date: datetime, end_date: datetime):
@@ -20,6 +20,17 @@ def get_shift_by_id(shift_id: int) -> Shift | None:
 def get_all_shifts() -> [Shift]:
     with get_db() as session:
         return session.query(Shift).all()
+
+
+def get_user_shifts_by_email(email: str) -> [Shift]:
+    with get_db() as session:
+        # get user id
+        user = get_user_shifts_by_email(email)
+        # extract all shifts ids
+        shifts_ids = [_.shift_id for _ in session.query(UserShift).filter_by(user_id=user.id).all()]
+        # extract info about each shift
+        shifts = session.query(Shift).filter(Shift.id.in_(shifts_ids)).all()
+        return shifts
 
 
 def remove_shift(shift_id: int):
