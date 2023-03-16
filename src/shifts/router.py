@@ -2,11 +2,11 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from auth.schemas import UserInfo
 from src.auth.dependencies import get_current_user, check_user_status
 from src.db.crud.shifts import get_all_shifts, get_shift_by_id, \
     add_shift as add_shift_db, get_user_shifts_by_phone_number
 from src.shifts.schemas import Shift
+from user.schemas import UserInfo
 
 router = APIRouter(tags=["Shifts"], prefix='/shifts')
 

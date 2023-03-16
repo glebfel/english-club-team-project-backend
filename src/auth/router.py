@@ -4,8 +4,7 @@ import jwt
 from fastapi import HTTPException, Depends, APIRouter
 from passlib.context import CryptContext
 
-from src.auth.dependencies import get_current_user
-from src.auth.schemas import Token, UserRegister, UserInfo, UserLogin
+from src.auth.schemas import Token, UserRegister, UserLogin
 from src.config import settings
 from src.db.crud.users import get_user_by_phone_number, add_new_user
 from src.db.models import User
@@ -71,8 +70,3 @@ def login_for_access_token(form_data: UserLogin = Depends()) -> Token:
         expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type='bearer', expire=datetime.utcnow() + access_token_expires)
-
-
-@router.get("/me")
-def read_users_me(current_user=Depends(get_current_user)) -> UserInfo:
-    return current_user
