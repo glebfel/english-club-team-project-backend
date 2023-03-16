@@ -35,3 +35,4 @@ def get_my_shifts(current_user: UserInfo = Depends(get_current_user)) -> list[Sh
 def add_shift(shift: Shift):
     """Add new shift (required admin permission)"""
     add_shift_db(shift.name, shift.start_date, shift.end_date)
+    return {'status': 'success', 'message': 'Shift added'}

@@ -14,21 +14,20 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", scheme_name="JWT")
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInfo:
     try:
         payload = jwt.decode(token, settings.AUTH_SECRET_KEY, algorithms=[settings.ALGORITHM])
-        email: str = payload.get("email")
-        if email is None:
+        phone_number: str = payload.get("phone_number")
+        if phone_number is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate credentials",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        expire: datetime = payload.get("exp")
     except jwt.PyJWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    user = get_user_by_phone_number(email)
+    user = get_user_by_phone_number(phone_number)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return UserInfo(id=user.id, first_name=user.first_name, last_name=user.last_name,

@@ -17,6 +17,7 @@ def get_all_news() -> NewsList:
 def add_news(news: NewsItem):
     """Add new news (required admin permission)"""
     add_news_db(news.title, news.content)
+    return {'status': 'success', 'message': 'News added'}
 
 
 @news_router.get("/info", dependencies=[Depends(get_current_user)])
