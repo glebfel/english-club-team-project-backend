@@ -33,3 +33,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInfo:
         raise HTTPException(status_code=404, detail="User not found")
     return UserInfo(name=user.name, email=user.email,
                     is_admin=user.is_admin, access_token=Token(access_token=token, expire=expire, token_type='Bearer'))
+
+
+async def check_user_status(user: UserInfo = Depends(get_current_user)):
+    if not user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Current user has no permission to do this action")
