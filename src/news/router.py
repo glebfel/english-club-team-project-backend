@@ -9,9 +9,11 @@ router = APIRouter(tags=["News"], prefix='/news')
 
 @router.get("/all", dependencies=[Depends(get_current_user)])
 def get_all_news() -> NewsList:
+    """Get all news"""
     return NewsList(news=[NewsItem(title=i.title, content=i.content) for i in get_news_db()])
 
 
 @router.post("/add", dependencies=[Depends(check_user_status)])
 def add_news(news: NewsItem):
+    """Add new news (required admin permission)"""
     add_news_db(news.title, news.content)
