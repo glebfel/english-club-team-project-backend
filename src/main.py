@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from auth.router import auth_router
 from news.router import news_router
 from shifts.router import shifts_router
-from src.config import settings
+from config import settings
 from tasks.router import tasks_router
 from user.router import user_router
 

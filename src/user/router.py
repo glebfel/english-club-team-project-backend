@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from db.crud.users import get_user_by_phone_number, update_user_by_phone_number
-from src.auth.dependencies import get_current_user, check_user_status
-from user.schemas import UserInfo, UpdateInfo
+from ..db.crud.users import get_user_by_phone_number, update_user_by_phone_number
+from ..auth.dependencies import get_current_user, check_user_status
+from .schemas import UserInfo, UpdateInfo
 
 user_router = APIRouter(tags=["Users"], prefix='/user')
 
