@@ -96,9 +96,21 @@ class Task(Base):
     score = Column(Integer, nullable=False)
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
-    status = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=True)
 
     responses = relationship("TaskResponse", back_populates="task")
+
+
+class UserTask(Base):
+    __tablename__ = "user_task"
+
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+    task_id = Column(Integer, ForeignKey("tasks.id"), primary_key=True)
+    is_completed = Column(Boolean, default=False)
+    is_checked = Column(Boolean, default=False)
+
+    user = relationship("User")
+    task = relationship("Task")
 
 
 class TaskResponse(Base):
@@ -107,8 +119,8 @@ class TaskResponse(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     task_id = Column(Integer, ForeignKey("tasks.id"))
-    response = Column(String, nullable=False)
     response_time = Column(DateTime, server_default=func.now())
+    is_approved = Column(Boolean, default=False)
 
     user = relationship("User")
     task = relationship("Task")
