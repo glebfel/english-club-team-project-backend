@@ -4,12 +4,20 @@ from sqlalchemy.exc import NoResultFound
 from db.crud.tasks import get_user_tasks_by_phone_number, get_task_by_id, \
     get_all_active_tasks as get_all_active_tasks_db, \
     response_to_task as response_to_task_db, approve_task_response as approve_task_response_db, \
-    get_all_not_approved_tasks_responses, submit_task as submit_task_db, check_task as  check_task_db
+    get_all_not_approved_tasks_responses, submit_task as submit_task_db, \
+    check_task as check_task_db, add_task as add_task_db
 from src.auth.dependencies import get_current_user, check_user_status
 from tasks.schemas import Task, TaskResponse
 from user.schemas import UserInfo
 
 tasks_router = APIRouter(tags=["Tasks"], prefix='/tasks')
+
+
+@tasks_router.post('/add/{task_id}', dependencies=[Depends(check_user_status)])
+def add_task(task: Task):
+    """Add new task (by admin)"""
+    add_task_db(**task.dict())
+    return {'status': 'success', 'message': 'Shift added'}
 
 
 @tasks_router.get("/my_tasks")
@@ -33,7 +41,7 @@ def get_all_tasks() -> list[Task]:
     return get_all_active_tasks_db()
 
 
-@tasks_router.post('/{task_id}/response')
+@tasks_router.post('/response/{task_id}')
 def response_to_task(task_id: int, current_user: UserInfo = Depends(get_current_user)):
     """Respond to task (by user)"""
     try:
@@ -43,7 +51,7 @@ def response_to_task(task_id: int, current_user: UserInfo = Depends(get_current_
     return {'status': 'success', 'message': 'Task completed'}
 
 
-@tasks_router.post('/responses/{response_id}/approve', dependencies=[Depends(check_user_status)])
+@tasks_router.put('/responses/approve/{response_id}', dependencies=[Depends(check_user_status)])
 def approve_response(response_id: int):
     """Approve task response (by admin)"""
     try:
@@ -59,7 +67,7 @@ def get_not_approved_responses() -> list[TaskResponse]:
     return [TaskResponse(**response.dict()) for response in get_all_not_approved_tasks_responses()]
 
 
-@tasks_router.post('/{task_id}', dependencies=[Depends(get_current_user)])
+@tasks_router.put('/submit/{task_id}', dependencies=[Depends(get_current_user)])
 def submit_task(task_id: int):
     """Submit task (by user)"""
     try:
@@ -69,7 +77,7 @@ def submit_task(task_id: int):
     return {'status': 'success', 'message': 'Task submitted'}
 
 
-@tasks_router.post('/{task_id}', dependencies=[Depends(get_current_user)])
+@tasks_router.put('/check/{task_id}', dependencies=[Depends(get_current_user)])
 def check_task(task_id: int):
     """Check task (by admin)"""
     try:
