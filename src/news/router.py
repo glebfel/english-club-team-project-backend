@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from ..auth.dependencies import get_current_user, check_user_status
-from ..db.crud.news import get_news as get_news_db, add_news as add_news_db, get_news_by_id
-from ..news.schemas import NewsItem
+from auth.dependencies import get_current_user, check_user_status
+from db.crud.news import get_news as get_news_db, add_news as add_news_db, get_news_by_id
+from news.schemas import NewsItem
 
 news_router = APIRouter(tags=["News"], prefix='/news')
 

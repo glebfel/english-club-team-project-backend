@@ -2,9 +2,9 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
-from ..db.crud.users import get_user_by_phone_number
-from ..config import settings
-from ..user.schemas import UserInfo
+from db.crud.users import get_user_by_phone_number
+from config import settings
+from user.schemas import UserInfo
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", scheme_name="JWT")
 

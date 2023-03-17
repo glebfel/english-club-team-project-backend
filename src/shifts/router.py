@@ -2,13 +2,13 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from ..auth.dependencies import get_current_user, check_user_status
-from ..db.crud.shifts import get_all_shifts, get_shift_by_id, \
+from auth.dependencies import get_current_user, check_user_status
+from db.crud.shifts import get_all_shifts, get_shift_by_id, \
     add_shift as add_shift_db, get_user_shifts_by_phone_number, \
     approve_shift_reservation as approve_shift_reservation_db, reserve_shift as reserve_shift_db, \
     get_shifts_reservations
-from ..shifts.schemas import Shift, ShiftReservation
-from ..user.schemas import UserInfo
+from shifts.schemas import Shift, ShiftReservation
+from user.schemas import UserInfo
 
 shifts_router = APIRouter(tags=["Shifts"], prefix='/shifts')
 
