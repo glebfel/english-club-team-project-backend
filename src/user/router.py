@@ -7,7 +7,7 @@ from user.schemas import UserInfo, UpdateInfo
 user_router = APIRouter(tags=["Users"], prefix='/user')
 
 
-@user_router.get("/info", dependencies=[Depends(check_user_status)])
+@user_router.get("/info/{phone_number}", dependencies=[Depends(check_user_status)])
 def get_user_info(phone_number: str) -> UserInfo:
     """Get user info by phone number (required admin rights)"""
     if not (user := get_user_by_phone_number(phone_number)):

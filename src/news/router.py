@@ -20,7 +20,7 @@ def add_news(news: NewsItem):
     return {'status': 'success', 'message': 'News added'}
 
 
-@news_router.get("/info", dependencies=[Depends(get_current_user)])
+@news_router.get("/info/{news_id}", dependencies=[Depends(get_current_user)])
 def get_news_info_by_id(news_id: int) -> NewsItem:
     """Get news info"""
     if not (news := get_news_by_id(news_id)):

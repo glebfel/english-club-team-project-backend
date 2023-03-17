@@ -19,7 +19,7 @@ def get_upcoming_shifts() -> list[Shift]:
     return [shift for shift in get_all_shifts() if shift.start_date > datetime.now()]
 
 
-@shifts_router.get("/info", dependencies=[Depends(get_current_user)])
+@shifts_router.get("/info/{shift_id}", dependencies=[Depends(get_current_user)])
 def get_shift_info(shift_id: int) -> Shift | None:
     """Get shift info by id"""
     if not (shift := get_shift_by_id(shift_id)):
@@ -40,7 +40,7 @@ def add_shift(shift: Shift):
     return {'status': 'success', 'message': 'Shift added'}
 
 
-@shifts_router.post("/reserve")
+@shifts_router.post("/reserve/{shift_id}")
 def reserve_shift(shift_id: int, current_user: UserInfo = Depends(get_current_user)):
     """Reserve shift """
     reserve_shift_db(shift_id=shift_id, user_id=current_user.id)
@@ -53,7 +53,7 @@ def show_shift_reservations() -> list[ShiftReservation]:
     return [ShiftReservation(**reservation.dict()) for reservation in get_shifts_reservations()]
 
 
-@shifts_router.put("/approve", dependencies=[Depends(check_user_status)])
+@shifts_router.put("/approve/{shift_reservation_id}", dependencies=[Depends(check_user_status)])
 def approve_shift_reservation(shift_reservation_id: int, ):
     """Approve shift reservation (required admin rights)"""
     approve_shift_reservation_db(shift_reservation_id=shift_reservation_id)
