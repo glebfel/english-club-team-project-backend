@@ -13,7 +13,7 @@ from user.schemas import UserInfo
 tasks_router = APIRouter(tags=["Tasks"], prefix='/tasks')
 
 
-@tasks_router.post('/add/{task_id}', dependencies=[Depends(check_user_status)])
+@tasks_router.post('/add', dependencies=[Depends(check_user_status)])
 def add_task(task: Task):
     """Add new task (by admin)"""
     add_task_db(**task.dict())
