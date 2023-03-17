@@ -16,7 +16,7 @@ services:
     depends_on:
       - db
     ports:
-      - 8080:8080
+      - 8000:8000
 
   api:
     build: ./src
@@ -25,4 +25,4 @@ services:
     depends_on:
       - db
     ports:
-      - ${API_PORT}:8080
+      - ${FAST_API_PORT}:8080
