@@ -5,10 +5,10 @@ from fastapi import HTTPException, Depends, APIRouter, status
 from fastapi.security import OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 
-from src.auth.schemas import Token, UserRegister
-from src.config import settings
-from src.db.crud.users import get_user_by_phone_number, add_new_user
-from src.db.models import User
+from auth.schemas import Token, UserRegister
+from config import settings
+from db.crud.users import get_user_by_phone_number, add_new_user
+from db.models import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

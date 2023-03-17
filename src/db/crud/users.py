@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from src.db.connector import get_db
-from src.db.models import User
+from db.connector import get_db
+from db.models import User
 
 
 def get_user_by_phone_number(phone_number: str) -> User:

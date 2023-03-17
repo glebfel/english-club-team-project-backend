@@ -1,5 +1,5 @@
-from src.db.connector import get_db
-from src.db.models import News
+from db.connector import get_db
+from db.models import News
 
 
 def add_news(title: str, content: str):

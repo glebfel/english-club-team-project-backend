@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from db.crud.users import get_user_by_phone_number
-from src.db.connector import get_db
-from src.db.models import Shift, UserShift, ShiftReservation
+from db.connector import get_db
+from db.models import Shift, UserShift, ShiftReservation
 
 
 def add_shift(name: str, start_date: datetime, end_date: datetime):

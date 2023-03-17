@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from db.crud.users import get_user_by_phone_number
-from src.db.connector import get_db
-from src.db.models import Task, TaskResponse, UserTask
+from db.connector import get_db
+from db.models import Task, TaskResponse, UserTask
 
 
 def add_task(title: str, description: str, requirements: str, score: int, start_date: datetime, end_date: datetime):
