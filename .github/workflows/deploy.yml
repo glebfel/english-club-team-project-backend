@@ -1,0 +1,24 @@
+name: Docker Compose CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  remote_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: glebfel/github-action-ssh-docker-compose@master
+      name: Docker-Compose Remote Deployment
+      with:
+        docker_compose_filename: ./docker-compose.yml
+        ssh_host: ${{ secrets.SSH_HOST }}
+        ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        ssh_user: ${{ secrets.SSH_USER }}
+        docker_compose_prefix: ${{ secrets.SSH_HOST }}
