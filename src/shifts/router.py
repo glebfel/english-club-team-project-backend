@@ -35,7 +35,7 @@ def get_my_shifts(current_user: UserInfo = Depends(get_current_user)) -> list[Sh
 
 @shifts_router.post("/add", dependencies=[Depends(check_user_status)])
 def add_shift(shift: Shift):
-    """Add new shift (required admin permission)"""
+    """Add new shift (required admin rights)"""
     add_shift_db(shift.name, shift.start_date, shift.end_date)
     return {'status': 'success', 'message': 'Shift added'}
 
@@ -49,12 +49,12 @@ def reserve_shift(shift_id: int, current_user: UserInfo = Depends(get_current_us
 
 @shifts_router.get("/reservations")
 def show_shift_reservations() -> list[ShiftReservation]:
-    """Show all shifts reservations (required admin permission)"""
+    """Show all shifts reservations (required admin rights)"""
     return [ShiftReservation(**reservation.dict()) for reservation in get_shifts_reservations()]
 
 
 @shifts_router.put("/approve", dependencies=[Depends(check_user_status)])
 def approve_shift_reservation(shift_reservation_id: int, ):
-    """Approve shift reservation (required admin permission)"""
+    """Approve shift reservation (required admin rights)"""
     approve_shift_reservation_db(shift_reservation_id=shift_reservation_id)
     return {'status': 'success', 'message': 'Shift added'}

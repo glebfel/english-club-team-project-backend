@@ -9,7 +9,7 @@ user_router = APIRouter(tags=["Users"], prefix='/user')
 
 @user_router.get("/info", dependencies=[Depends(check_user_status)])
 def get_user_info(phone_number: str) -> UserInfo:
-    """Get user info by phone number (required admin permission)"""
+    """Get user info by phone number (required admin rights)"""
     if not (user := get_user_by_phone_number(phone_number)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return UserInfo(**user.dict())
@@ -17,7 +17,7 @@ def get_user_info(phone_number: str) -> UserInfo:
 
 @user_router.get("/all", dependencies=[Depends(check_user_status)])
 def get_all_users_info() -> list[UserInfo]:
-    """Get all users info (required admin permission)"""
+    """Get all users info (required admin rights)"""
     return [UserInfo(**user.dict()) for user in get_all_users_info()]
 
 
@@ -40,7 +40,7 @@ def update_my_info(user_info: UpdateInfo, current_user: UserInfo = Depends(get_c
 
 @user_router.put("/update", dependencies=[Depends(check_user_status)])
 def update_user(phone_number: str, user_info: UpdateInfo):
-    """Update user info by phone number (required admin permission)"""
+    """Update user info by phone number (required admin rights)"""
     updatable_fields = {}
     for i in user_info.dict():
         if user_info.dict()[i]:

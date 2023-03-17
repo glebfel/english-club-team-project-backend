@@ -15,7 +15,7 @@ def get_all_news() -> list[NewsItem]:
 
 @news_router.post("/add", dependencies=[Depends(check_user_status)])
 def add_news(news: NewsItem):
-    """Add new news (required admin permission)"""
+    """Add new news (required admin rights)"""
     add_news_db(news.title, news.content)
     return {'status': 'success', 'message': 'News added'}
 
