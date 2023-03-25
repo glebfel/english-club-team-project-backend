@@ -30,7 +30,7 @@ def get_shift_info(shift_id: int) -> Shift | None:
 @shifts_router.get("/my")
 def get_my_shifts(current_user: UserInfo = Depends(get_current_user)) -> list[Shift]:
     """Get shifts for current user"""
-    return [Shift(**shift.dict()) for shift in get_user_shifts_by_email(current_user.phone_number)]
+    return [Shift(**shift.dict()) for shift in get_user_shifts_by_email(current_user.email)]
 
 
 @shifts_router.post("/add", dependencies=[Depends(check_user_status)])

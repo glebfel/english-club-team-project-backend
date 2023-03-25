@@ -44,7 +44,7 @@ def create_access_token(data: dict, expires_delta: timedelta) -> str:
 def register_user(user: UserRegister) -> Token:
     db_user = get_user_by_email(email=user.email)
     if db_user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Phone number already registered")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email is already registered")
     add_new_user(first_name=user.first_name, last_name=user.last_name,
                  email=user.email, username=user.username,
                  hashed_password=get_password_hash(user.password), admin=user.is_admin)
@@ -60,7 +60,7 @@ def register_user(user: UserRegister) -> Token:
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect phone number or password")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email or password")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"username": user.username, "email": user.email, "exp": datetime.utcnow() + access_token_expires},

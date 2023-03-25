@@ -23,7 +23,7 @@ def add_task(task: Task):
 @tasks_router.get("/my_tasks")
 def get_my_tasks(current_user: UserInfo = Depends(get_current_user)) -> list[Task]:
     """Get tasks for current user"""
-    return [Task(**task.dict()) for task in get_user_tasks_by_email(current_user.phone_number)]
+    return [Task(**task.dict()) for task in get_user_tasks_by_email(current_user.email)]
 
 
 @tasks_router.get('/{task_id}', dependencies=[Depends(get_current_user)])
