@@ -9,6 +9,7 @@ from db.crud.shifts import get_all_shifts, get_shift_by_id, \
     get_shifts_reservations
 from shifts.schemas import Shift, ShiftReservation
 from user.schemas import UserInfo
+from utils import convert_sqlalchemy_row_to_dict
 
 shifts_router = APIRouter(tags=["Shifts"], prefix='/shifts')
 
@@ -24,13 +25,13 @@ def get_shift_info(shift_id: int) -> Shift | None:
     """Get shift info by id"""
     if not (shift := get_shift_by_id(shift_id)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Shift not found")
-    return Shift(**shift.dict())
+    return Shift(**convert_sqlalchemy_row_to_dict(shift))
 
 
 @shifts_router.get("/my")
 def get_my_shifts(current_user: UserInfo = Depends(get_current_user)) -> list[Shift]:
     """Get shifts for current user"""
-    return [Shift(**shift.dict()) for shift in get_user_shifts_by_email(current_user.email)]
+    return [Shift(**convert_sqlalchemy_row_to_dict(shift)) for shift in get_user_shifts_by_email(current_user.email)]
 
 
 @shifts_router.post("/add", dependencies=[Depends(check_user_status)])
@@ -50,7 +51,7 @@ def reserve_shift(shift_id: int, current_user: UserInfo = Depends(get_current_us
 @shifts_router.get("/reservations")
 def show_shift_reservations() -> list[ShiftReservation]:
     """Show all shifts reservations (required admin rights)"""
-    return [ShiftReservation(**reservation.dict()) for reservation in get_shifts_reservations()]
+    return [ShiftReservation(**convert_sqlalchemy_row_to_dict(reservation)) for reservation in get_shifts_reservations()]
 
 
 @shifts_router.put("/approve/{shift_reservation_id}", dependencies=[Depends(check_user_status)])

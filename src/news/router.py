@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from auth.dependencies import get_current_user, check_user_status
 from db.crud.news import get_news as get_news_db, add_news as add_news_db, get_news_by_id
 from news.schemas import NewsItem
+from utils import convert_sqlalchemy_row_to_dict
 
 news_router = APIRouter(tags=["News"], prefix='/news')
 
@@ -25,4 +26,4 @@ def get_news_info_by_id(news_id: int) -> NewsItem:
     """Get news info"""
     if not (news := get_news_by_id(news_id)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="News not found")
-    return NewsItem(**news.dict())
+    return NewsItem(**convert_sqlalchemy_row_to_dict(news))
