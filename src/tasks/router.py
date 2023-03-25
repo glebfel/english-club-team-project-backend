@@ -21,7 +21,7 @@ def add_task(task: Task):
     return {'status': 'success', 'message': 'Shift added'}
 
 
-@tasks_router.get("/my_tasks")
+@tasks_router.get("/my")
 def get_my_tasks(current_user: UserInfo = Depends(get_current_user)) -> list[Task]:
     """Get tasks for current user"""
     return [Task(**convert_sqlalchemy_row_to_dict(task)) for task in get_user_tasks_by_email(current_user.email)]
