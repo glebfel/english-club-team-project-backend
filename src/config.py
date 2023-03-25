@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     FAST_API_PORT: int = Field(default=8080, env="FAST_API_PORT")
     # api auth settings
     AUTH_SECRET_KEY: str = Field(..., env="AUTH_SECRET_KEY")
+    ALGORITHM: str = Field(default='HS256', env="ALGORITHM")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
 
     class Config:
