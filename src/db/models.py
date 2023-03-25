@@ -11,11 +11,9 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String, nullable=False)
-    phone_number = Column(String, unique=True, nullable=False)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     username = Column(String, nullable=False)
-    birthday = Column(DateTime, nullable=True)
     experience = Column(Integer, nullable=True)
     rank = Column(String, nullable=True)
     hobby = Column(String, nullable=True)
