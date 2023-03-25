@@ -8,8 +8,6 @@ class UserInfo(BaseModel):
     first_name: str = Field(max_length=30)
     last_name: str = Field(max_length=30)
     username: str = Field(max_length=30)
-    birthday: datetime
-    phone_number: str
     email: EmailStr
     experience: int = Field(default=None)
     rank: str = Field(default=None)

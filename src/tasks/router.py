@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import NoResultFound
 
-from db.crud.tasks import get_user_tasks_by_phone_number, get_task_by_id, \
+from db.crud.tasks import get_user_tasks_by_email, get_task_by_id, \
     get_all_active_tasks as get_all_active_tasks_db, \
     response_to_task as response_to_task_db, approve_task_response as approve_task_response_db, \
     get_all_not_approved_tasks_responses, submit_task as submit_task_db, \
@@ -23,7 +23,7 @@ def add_task(task: Task):
 @tasks_router.get("/my_tasks")
 def get_my_tasks(current_user: UserInfo = Depends(get_current_user)) -> list[Task]:
     """Get tasks for current user"""
-    return [Task(**task.dict()) for task in get_user_tasks_by_phone_number(current_user.phone_number)]
+    return [Task(**task.dict()) for task in get_user_tasks_by_email(current_user.phone_number)]
 
 
 @tasks_router.get('/{task_id}', dependencies=[Depends(get_current_user)])

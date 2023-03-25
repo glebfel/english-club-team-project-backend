@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from db.crud.users import get_user_by_phone_number
+from db.crud.users import get_user_by_email
 from db.connector import get_db
 from db.models import Task, TaskResponse, UserTask
 
@@ -24,10 +24,10 @@ def get_all_active_tasks() -> list[Task]:
         return session.query(Task).filter_by(is_active=True).all()
 
 
-def get_user_tasks_by_phone_number(phone_number: str) -> list[Task]:
+def get_user_tasks_by_email(email: str) -> list[Task]:
     with get_db() as session:
         # get user id
-        user = get_user_by_phone_number(phone_number)
+        user = get_user_by_email(email)
         # extract all shifts ids
         tasks_ids = [_.shift_id for _ in session.query(UserTask).filter_by(user_id=user.id).all()]
         # extract info about each shift
