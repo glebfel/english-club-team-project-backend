@@ -19,6 +19,7 @@ services:
 
   api:
     build: ./src
+    restart: on-failure
     depends_on:
       - db
     env_file:
