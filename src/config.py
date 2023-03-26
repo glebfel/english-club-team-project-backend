@@ -10,11 +10,11 @@ class Settings(BaseSettings):
     # for main db
     POSTGRES_USER: str = Field(default='postgres', env='POSTGRES_USER')
     POSTGRES_PASSWORD: str = Field(..., env='POSTGRES_PASSWORD')
-    POSTGRES_HOST: str = Field(default='localhost', env='POSTGRES_HOST')
-    POSTGRES_PORT: int = Field(default=5433, env='POSTGRES_PORT')
+    POSTGRES_HOST: str = Field(default='db', env='POSTGRES_HOST')
+    POSTGRES_PORT: int = Field(default=5432, env='POSTGRES_PORT')
     POSTGRES_DB: str = Field(default='postgres', env='POSTGRES_DB')
     # for api
-    API_HOST: str = Field(default='localhost', env='API_HOST')
+    API_HOST: str = Field(default='0.0.0.0', env='API_HOST')
     API_VERSION: str = Field(default='1.0.0', env='API_VERSION')
     API_DESCRIPTION: str = Field(default='API service for children`s camp 🏕', env='API_DESCRIPTION')
     # api auth settings

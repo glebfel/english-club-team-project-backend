@@ -1,5 +1,10 @@
 version: "3.8"
 services:
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
   db:
     image: postgres:13
     restart: unless-stopped
@@ -17,4 +22,4 @@ services:
     env_file:
       - .env
     ports:
-      - ${API_PORT}:8080
+      - ${API_PORT}:8180
