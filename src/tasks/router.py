@@ -14,10 +14,10 @@ from utils import convert_sqlalchemy_row_to_dict
 tasks_router = APIRouter(tags=["Tasks"], prefix='/tasks')
 
 
-@tasks_router.post('/add', dependencies=[Depends(check_user_status)])
-def add_task(task: BaseTask):
+@tasks_router.post('/add')
+def add_task(task: BaseTask, current_user: UserInfo = Depends(check_user_status)):
     """Add new task (by admin)"""
-    add_task_db(**task.dict())
+    add_task_db(**task.dict(), author_id=current_user.id)
     return {'status': 'success', 'message': 'Task added'}
 
 

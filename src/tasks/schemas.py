@@ -15,7 +15,6 @@ class BaseTask(BaseModel):
 class TaskInfo(BaseTask):
     id: int
     author_id: int
-    participants_number: int = Field(default=0)
 
 
 class TaskResponse(BaseModel):
