@@ -2,11 +2,14 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, EmailStr
 
+from user.schemas import UserInfo
+
 
 class Token(BaseModel):
     access_token: str
     token_type: str
     expire: datetime
+    user_info: UserInfo
 
 
 class UserRegister(BaseModel):
