@@ -7,10 +7,11 @@ from db.connector import get_db
 from db.models import Task, TaskResponse, User
 
 
-def add_task(title: str, description: str, author_id: int, points: int, start_date: datetime, end_date: datetime):
+def add_task(title: str, description: str, author_id: int, points: int,
+             start_date: datetime, end_date: datetime, is_active: bool):
     with get_db() as session:
         task = Task(title=title, description=description, author_id=author_id,
-                    points=points, start_date=start_date, end_date=end_date)
+                    points=points, start_date=start_date, end_date=end_date, is_active=is_active)
         session.add(task)
         session.commit()
         session.refresh(task)

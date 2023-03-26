@@ -27,19 +27,19 @@ def get_my_tasks(current_user: UserInfo = Depends(get_current_user)) -> list[Tas
     return [TaskInfo(**convert_sqlalchemy_row_to_dict(task)) for task in get_user_tasks_by_email(current_user.email)]
 
 
-@tasks_router.get('/{task_id}', dependencies=[Depends(get_current_user)])
-def get_task(task_id: int) -> TaskInfo:
-    """Get task by id"""
-    task = get_task_by_id(task_id)
-    if not task:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Task not found')
-    return task
-
-
 @tasks_router.get('/all', dependencies=[Depends(get_current_user)])
 def get_all_tasks() -> list[TaskInfo]:
     """Get all active tasks"""
-    return get_all_active_tasks_db()
+    return [TaskInfo(**convert_sqlalchemy_row_to_dict(task)) for task in get_all_active_tasks_db()]
+
+
+@tasks_router.get('/{task_id}', dependencies=[Depends(get_current_user)])
+def get_task(task_id: int) -> TaskInfo:
+    """Get task by id"""
+    task = TaskInfo(**convert_sqlalchemy_row_to_dict(get_task_by_id(task_id)))
+    if not task:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Task not found')
+    return task
 
 
 @tasks_router.post('/response/{task_id}')
@@ -49,7 +49,7 @@ def response_to_task(task_id: int, current_user: UserInfo = Depends(get_current_
         response_to_task_db(task_id, current_user.id)
     except NoResultFound:
         raise HTTPException(status_code=status.status.HTTP_404_NOT_FOUND, detail='Task not found')
-    return {'status': 'success', 'message': 'Task completed'}
+    return {'status': 'success', 'message': 'Task response sent'}
 
 
 @tasks_router.put('/responses/approve/{response_id}', dependencies=[Depends(check_user_status)])
