@@ -1,14 +1,16 @@
 from datetime import datetime
 
+from sqlalchemy import and_
+
 from db.crud.users import get_user_by_email
 from db.connector import get_db
-from db.models import Task, TaskResponse, UserTask
+from db.models import Task, TaskResponse, User
 
 
-def add_task(title: str, description: str, requirements: str, score: int, start_date: datetime, end_date: datetime):
+def add_task(title: str, description: str, author_id: int, points: int, start_date: datetime, end_date: datetime):
     with get_db() as session:
-        task = Task(title=title, description=description, requirements=requirements,
-                    score=score, start_date=start_date, end_date=end_date)
+        task = Task(title=title, description=description, author_id=author_id,
+                    points=points, start_date=start_date, end_date=end_date)
         session.add(task)
         session.commit()
         session.refresh(task)
@@ -28,8 +30,8 @@ def get_user_tasks_by_email(email: str) -> list[Task]:
     with get_db() as session:
         # get user id
         user = get_user_by_email(email)
-        # extract all shifts ids
-        tasks_ids = [_.shift_id for _ in session.query(UserTask).filter_by(user_id=user.id).all()]
+        # extract all task ids
+        tasks_ids = [_.task_id for _ in session.query(TaskResponse).filter_by(user_id=user.id).all()]
         # extract info about each shift
         tasks = session.query(Task).filter(Task.id.in_(tasks_ids)).all()
         return tasks
@@ -48,6 +50,11 @@ def get_all_not_approved_tasks_responses() -> list[TaskResponse]:
         return session.query(TaskResponse).filter_by(is_approved=False).all()
 
 
+def get_all_not_unchecked_tasks_responses() -> list[TaskResponse]:
+    with get_db() as session:
+        return session.query(TaskResponse).filter_by(and_(TaskResponse.is_approved==True, TaskResponse.is_completed==True, TaskResponse.is_checked==False)).all()
+
+
 def approve_task_response(task_response_id: int):
     with get_db() as session:
         # update approve status
@@ -55,18 +62,23 @@ def approve_task_response(task_response_id: int):
         session.commit()
 
 
-def submit_task(task_id: int):
+def submit_task(user_id: int, task_id: int):
     with get_db() as session:
         # update completed status
-        session.query(UserTask).filter_by(id=task_id).update({'is_completed': True})
+        session.query(TaskResponse).filter(and_(TaskResponse.task_id==task_id, TaskResponse.user_id==user_id)).update({'is_completed': True})
         session.commit()
 
 
-def check_task(task_id: int):
+def check_task(task_response_id: int):
     with get_db() as session:
         # update checked status
-        session.query(UserTask).filter_by(id=task_id).update({'is_checked': True})
-        # TODO: update user scores
+        task_response_query = session.query(TaskResponse).filter_by(id=task_response_id)
+        task_response_query.update({'is_checked': True})
+        # update user scores
+        task_response = task_response_query.first()
+        task = session.query(Task).filter_by(id=task_response.task_id).first()
+        session.query(User).filter_by(id=task_response.user_id).update({'points': User.points + task.points})
+        session.commit()
 
 
 def remove_task(task_id: int):

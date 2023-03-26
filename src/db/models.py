@@ -15,7 +15,7 @@ class User(Base):
     last_name = Column(String, nullable=False)
     username = Column(String, nullable=False)
     experience = Column(Integer, nullable=True)
-    rank = Column(String, nullable=True)
+    points = Column(Integer, default=0)
     hobby = Column(String, nullable=True)
     media_link = Column(String, nullable=True)
     hashed_password = Column(String, nullable=False)
@@ -89,26 +89,14 @@ class Task(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    author = Column(String, nullable=False)
-    requirements = Column(String, nullable=False)
-    score = Column(Integer, nullable=False)
-    start_date = Column(DateTime, nullable=False)
+    author_id = Column(Integer, ForeignKey("users.id"))
+    points = Column(Integer, nullable=False)
+    start_date = Column(DateTime, server_default=func.now())
     end_date = Column(DateTime, nullable=False)
     is_active = Column(Boolean, default=True)
 
+    user = relationship("User", back_populates="users")
     responses = relationship("TaskResponse", back_populates="task")
-
-
-class UserTask(Base):
-    __tablename__ = "user_task"
-
-    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    task_id = Column(Integer, ForeignKey("tasks.id"), primary_key=True)
-    is_completed = Column(Boolean, default=False)
-    is_checked = Column(Boolean, default=False)
-
-    user = relationship("User")
-    task = relationship("Task")
 
 
 class TaskResponse(Base):
@@ -119,6 +107,8 @@ class TaskResponse(Base):
     task_id = Column(Integer, ForeignKey("tasks.id"))
     response_time = Column(DateTime, server_default=func.now())
     is_approved = Column(Boolean, default=False)
+    is_completed = Column(Boolean, default=False)
+    is_checked = Column(Boolean, default=False)
 
     user = relationship("User")
     task = relationship("Task")

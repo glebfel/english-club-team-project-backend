@@ -65,20 +65,28 @@ def approve_response(response_id: int):
 @tasks_router.get("/responses", dependencies=[Depends(check_user_status)])
 def get_not_approved_responses() -> list[TaskResponse]:
     """Get all not approved responses (by admin)"""
-    return [TaskResponse(**convert_sqlalchemy_row_to_dict(response)) for response in get_all_not_approved_tasks_responses()]
+    return [TaskResponse(**convert_sqlalchemy_row_to_dict(response)) for response in
+            get_all_not_approved_tasks_responses()]
 
 
-@tasks_router.put('/submit/{task_id}', dependencies=[Depends(get_current_user)])
-def submit_task(task_id: int):
+@tasks_router.put('/submit/{task_id}')
+def submit_task(task_id: int, current_user: UserInfo = Depends(get_current_user)):
     """Submit task (by user)"""
     try:
-        submit_task_db(task_id)
+        submit_task_db(current_user.id, task_id)
     except NoResultFound:
         raise HTTPException(status_code=status.status.HTTP_404_NOT_FOUND, detail='Task not found')
     return {'status': 'success', 'message': 'Task submitted'}
 
 
-@tasks_router.put('/check/{task_id}', dependencies=[Depends(get_current_user)])
+@tasks_router.get("/responses/for_check", dependencies=[Depends(check_user_status)])
+def get_not_checked_responses() -> list[TaskResponse]:
+    """Get all not approved responses (by admin)"""
+    return [TaskResponse(**convert_sqlalchemy_row_to_dict(response)) for response in
+            get_all_not_approved_tasks_responses()]
+
+
+@tasks_router.put('/check/{task_response_id}', dependencies=[Depends(get_current_user)])
 def check_task(task_id: int):
     """Check task (by admin)"""
     try:
