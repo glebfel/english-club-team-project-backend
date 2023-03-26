@@ -1,15 +1,11 @@
 version: "3.8"
 services:
-  adminer:
-    image: adminer
-    restart: unless-stopped
-    ports:
-      - 8080:8080
   db:
     image: postgres:13
     restart: unless-stopped
+    ports:
+      - 5432:5432
     environment:
-      - POSTGRES_PORT=${POSTGRES_PORT}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - ./.data/postgres:/var/lib/postgresql/data
