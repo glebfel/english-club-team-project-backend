@@ -9,7 +9,7 @@ from config import settings
 from tasks.router import tasks_router
 from user.router import user_router
 
-app = FastAPI(title='Child Camp API', version=settings.API_VERSION, description=settings.API_DESCRIPTION)
+app = FastAPI(title='Children`s Camp API', version=settings.API_VERSION, description=settings.API_DESCRIPTION)
 app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(news_router)

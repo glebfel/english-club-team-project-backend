@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     # for api
     API_HOST: str = Field(default='localhost', env='API_HOST')
     API_VERSION: str = Field(default='1.0.0', env='API_VERSION')
-    API_DESCRIPTION: str = Field(default='API service for child camp 🏕', env='API_DESCRIPTION')
+    API_DESCRIPTION: str = Field(default='API service for children`s camp 🏕', env='API_DESCRIPTION')
     # api auth settings
     AUTH_SECRET_KEY: str = Field(..., env="AUTH_SECRET_KEY")
     ALGORITHM: str = Field(default='HS256', env="ALGORITHM")
