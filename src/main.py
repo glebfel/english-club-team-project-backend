@@ -9,7 +9,7 @@ from config import settings
 from tasks.router import tasks_router
 from user.router import user_router
 
-app = FastAPI(title='Child Camp API', version='1.0.0')
+app = FastAPI(title='Child Camp API', version=settings.API_VERSION, description=settings.API_DESCRIPTION)
 app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(news_router)
@@ -25,4 +25,4 @@ app.add_middleware(
 )
 
 if __name__ == "__main__":
-    uvicorn.run(app, host=settings.FAST_API_HOST, port=settings.FAST_API_PORT)
+    uvicorn.run(app, host=settings.API_HOST, port=settings.API_PORT)

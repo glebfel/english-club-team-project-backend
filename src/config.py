@@ -8,14 +8,16 @@ ROOT_PATH = str(pathlib.Path(__file__).parent.parent.parent)
 
 class Settings(BaseSettings):
     # for main db
-    POSTGRES_USER: str = Field(default='postgres', env="POSTGRES_USER")
-    POSTGRES_PASSWORD: str = Field(..., env="POSTGRES_PASSWORD")
-    POSTGRES_HOST: str = Field(default='localhost', env="POSTGRES_HOST")
-    POSTGRES_PORT: int = Field(default=5433, env="POSTGRES_PORT")
-    POSTGRES_DB: str = Field(default='postgres', env="POSTGRES_DB")
+    POSTGRES_USER: str = Field(default='postgres', env='POSTGRES_USER')
+    POSTGRES_PASSWORD: str = Field(..., env='POSTGRES_PASSWORD')
+    POSTGRES_HOST: str = Field(default='localhost', env='POSTGRES_HOST')
+    POSTGRES_PORT: int = Field(default=5433, env='POSTGRES_PORT')
+    POSTGRES_DB: str = Field(default='postgres', env='POSTGRES_DB')
     # for api
-    FAST_API_HOST: str = Field(default='localhost', env="FAST_API_HOST")
-    FAST_API_PORT: int = Field(default=8080, env="FAST_API_PORT")
+    API_HOST: str = Field(default='localhost', env='API_HOST')
+    API_PORT: int = Field(default=8080, env='API_PORT')
+    API_VERSION: str = Field(default='1.0.0', env='API_VERSION')
+    API_DESCRIPTION: str = Field(default='API service for child camp 🏕', env='API_DESCRIPTION')
     # api auth settings
     AUTH_SECRET_KEY: str = Field(..., env="AUTH_SECRET_KEY")
     ALGORITHM: str = Field(default='HS256', env="ALGORITHM")
