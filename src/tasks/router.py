@@ -7,7 +7,7 @@ from db.crud.tasks import get_user_tasks_by_email, get_task_by_id, \
     get_all_not_approved_tasks_responses, submit_task as submit_task_db, \
     check_task as check_task_db, add_task as add_task_db
 from auth.dependencies import get_current_user, check_user_status
-from tasks.schemas import Task, TaskResponse, TaskIn
+from tasks.schemas import TaskInfo, TaskResponse, BaseTask
 from user.schemas import UserInfo
 from utils import convert_sqlalchemy_row_to_dict
 
@@ -15,20 +15,20 @@ tasks_router = APIRouter(tags=["Tasks"], prefix='/tasks')
 
 
 @tasks_router.post('/add', dependencies=[Depends(check_user_status)])
-def add_task(task: TaskIn):
+def add_task(task: BaseTask):
     """Add new task (by admin)"""
     add_task_db(**task.dict())
     return {'status': 'success', 'message': 'Task added'}
 
 
 @tasks_router.get("/my")
-def get_my_tasks(current_user: UserInfo = Depends(get_current_user)) -> list[Task]:
+def get_my_tasks(current_user: UserInfo = Depends(get_current_user)) -> list[TaskInfo]:
     """Get tasks for current user"""
-    return [Task(**convert_sqlalchemy_row_to_dict(task)) for task in get_user_tasks_by_email(current_user.email)]
+    return [TaskInfo(**convert_sqlalchemy_row_to_dict(task)) for task in get_user_tasks_by_email(current_user.email)]
 
 
 @tasks_router.get('/{task_id}', dependencies=[Depends(get_current_user)])
-def get_task(task_id: int) -> Task:
+def get_task(task_id: int) -> TaskInfo:
     """Get task by id"""
     task = get_task_by_id(task_id)
     if not task:
@@ -37,7 +37,7 @@ def get_task(task_id: int) -> Task:
 
 
 @tasks_router.get('/all', dependencies=[Depends(get_current_user)])
-def get_all_tasks() -> list[Task]:
+def get_all_tasks() -> list[TaskInfo]:
     """Get all active tasks"""
     return get_all_active_tasks_db()
 
