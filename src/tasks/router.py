@@ -7,7 +7,7 @@ from db.crud.tasks import get_user_tasks_by_email, get_task_by_id, \
     get_all_not_approved_tasks_responses, submit_task as submit_task_db, \
     check_task as check_task_db, add_task as add_task_db
 from auth.dependencies import get_current_user, check_user_status
-from tasks.schemas import Task, TaskResponse
+from tasks.schemas import Task, TaskResponse, TaskIn
 from user.schemas import UserInfo
 from utils import convert_sqlalchemy_row_to_dict
 
@@ -15,10 +15,10 @@ tasks_router = APIRouter(tags=["Tasks"], prefix='/tasks')
 
 
 @tasks_router.post('/add', dependencies=[Depends(check_user_status)])
-def add_task(task: Task):
+def add_task(task: TaskIn):
     """Add new task (by admin)"""
     add_task_db(**task.dict())
-    return {'status': 'success', 'message': 'Shift added'}
+    return {'status': 'success', 'message': 'Task added'}
 
 
 @tasks_router.get("/my")
@@ -59,7 +59,7 @@ def approve_response(response_id: int):
         approve_task_response_db(response_id)
     except NoResultFound:
         raise HTTPException(status_code=status.status.HTTP_404_NOT_FOUND, detail='Task not found')
-    return {'status': 'success', 'message': 'Response approved'}
+    return {'status': 'success', 'message': 'Task response approved'}
 
 
 @tasks_router.get("/responses", dependencies=[Depends(check_user_status)])

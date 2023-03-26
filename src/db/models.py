@@ -95,7 +95,6 @@ class Task(Base):
     end_date = Column(DateTime, nullable=False)
     is_active = Column(Boolean, default=True)
 
-    user = relationship("User", back_populates="users")
     responses = relationship("TaskResponse", back_populates="task")
 
 
