@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     class Config:
         env_prefix = ""
         case_sentive = False
-        env_file = '.env'
+        env_file = '../.env'
         env_file_encoding = 'utf-8'
 
 
