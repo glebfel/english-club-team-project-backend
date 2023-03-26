@@ -15,7 +15,6 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = Field(default='postgres', env='POSTGRES_DB')
     # for api
     API_HOST: str = Field(default='localhost', env='API_HOST')
-    API_PORT: int = Field(default=8080, env='API_PORT')
     API_VERSION: str = Field(default='1.0.0', env='API_VERSION')
     API_DESCRIPTION: str = Field(default='API service for child camp 🏕', env='API_DESCRIPTION')
     # api auth settings
