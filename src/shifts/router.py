@@ -7,7 +7,7 @@ from db.crud.shifts import get_all_shifts, get_shift_by_id, \
     add_shift as add_shift_db, get_user_shifts_by_email, \
     approve_shift_reservation as approve_shift_reservation_db, reserve_shift as reserve_shift_db, \
     get_shifts_reservations
-from shifts.schemas import Shift, ShiftReservation
+from shifts.schemas import ShiftInfo, ShiftReservation, BaseShift
 from user.schemas import UserInfo
 from utils import convert_sqlalchemy_row_to_dict
 
@@ -15,27 +15,28 @@ shifts_router = APIRouter(tags=["Shifts"], prefix='/shifts')
 
 
 @shifts_router.get("/upcoming", dependencies=[Depends(get_current_user)])
-def get_upcoming_shifts() -> list[Shift]:
+def get_upcoming_shifts() -> list[ShiftInfo]:
     """Get all upcoming shifts"""
-    return [shift for shift in get_all_shifts() if shift.start_date > datetime.now()]
+    return [ShiftInfo(**convert_sqlalchemy_row_to_dict(shift)) for shift in get_all_shifts()
+            if shift.start_date > datetime.now()]
 
 
 @shifts_router.get("/info/{shift_id}", dependencies=[Depends(get_current_user)])
-def get_shift_info(shift_id: int) -> Shift | None:
+def get_shift_info(shift_id: int) -> ShiftInfo:
     """Get shift info by id"""
     if not (shift := get_shift_by_id(shift_id)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Shift not found")
-    return Shift(**convert_sqlalchemy_row_to_dict(shift))
+    return ShiftInfo(**convert_sqlalchemy_row_to_dict(shift))
 
 
 @shifts_router.get("/my")
-def get_my_shifts(current_user: UserInfo = Depends(get_current_user)) -> list[Shift]:
+def get_my_shifts(current_user: UserInfo = Depends(get_current_user)) -> list[ShiftInfo]:
     """Get shifts for current user"""
-    return [Shift(**convert_sqlalchemy_row_to_dict(shift)) for shift in get_user_shifts_by_email(current_user.email)]
+    return [ShiftInfo(**convert_sqlalchemy_row_to_dict(shift)) for shift in get_user_shifts_by_email(current_user.email)]
 
 
 @shifts_router.post("/add", dependencies=[Depends(check_user_status)])
-def add_shift(shift: Shift):
+def add_shift(shift: BaseShift):
     """Add new shift (required admin rights)"""
     add_shift_db(shift.name, shift.start_date, shift.end_date)
     return {'status': 'success', 'message': 'Shift added'}

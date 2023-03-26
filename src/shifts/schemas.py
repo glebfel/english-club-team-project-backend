@@ -3,12 +3,15 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
-class Shift(BaseModel):
-    id: int
+class BaseShift(BaseModel):
     name: str
-    participants_number: int
     start_date: datetime
     end_date: datetime
+
+
+class ShiftInfo(BaseShift):
+    id: int
+    participants_number: int
 
 
 class ShiftReservation(BaseModel):
