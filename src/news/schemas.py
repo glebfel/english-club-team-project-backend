@@ -1,10 +1,13 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
-class NewsItem(BaseModel):
-    id: int
+class NewsBase(BaseModel):
     title: str
     content: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class NewsInfo(NewsBase):
+    id: int
+    created_at: datetime
