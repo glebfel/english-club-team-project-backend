@@ -67,7 +67,7 @@ def register_user(user: UserRegister) -> Token:
 
 @auth_router.post("/login")
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
-    user = UserInfo(**convert_sqlalchemy_row_to_dict(authenticate_user(form_data.username, form_data.password)))
+    user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email or password")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -77,4 +77,4 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> 
     )
     return Token(access_token=access_token, token_type='bearer',
                  expire=datetime.utcnow() + access_token_expires,
-                 user_info=user)
+                 user_info=UserInfo(**convert_sqlalchemy_row_to_dict(user)))
