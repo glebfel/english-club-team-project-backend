@@ -53,7 +53,7 @@ def add_shift(shift: BaseShift):
 def reserve_shift(shift_id: int, current_user: UserInfo = Depends(get_current_user)):
     """Reserve shift """
     reserve_shift_db(shift_id=shift_id, user_id=current_user.id)
-    return {'status': 'success', 'message': 'Shift added'}
+    return {'status': 'success', 'message': 'Shift reservation sent for approval'}
 
 
 @shifts_router.get("/reservations")
@@ -66,4 +66,4 @@ def show_shift_reservations() -> list[ShiftReservation]:
 def approve_shift_reservation(shift_reservation_id: int, ):
     """Approve shift reservation (required admin rights)"""
     approve_shift_reservation_db(shift_reservation_id=shift_reservation_id)
-    return {'status': 'success', 'message': 'Shift added'}
+    return {'status': 'success', 'message': 'Shift reservation approved'}
