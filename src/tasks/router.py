@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.exceptions import RequestValidationError
+from pydantic.error_wrappers import ErrorWrapper
 from sqlalchemy.exc import NoResultFound
 
 from db.crud.tasks import get_user_tasks_by_email, get_task_by_id, \
@@ -21,7 +23,8 @@ def add_task(task: BaseTask, current_user: UserInfo = Depends(check_user_status)
         add_task_db(**task.dict(), author_id=current_user.id)
         return {'status': 'success', 'message': 'Task added'}
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        arg = 'start_date' if 'Start date must be before end date' in str(e) else 'end_date'
+        raise RequestValidationError([ErrorWrapper(e, ('body', arg))])
 
 
 @tasks_router.get("/my")

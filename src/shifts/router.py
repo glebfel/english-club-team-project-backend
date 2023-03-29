@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.exceptions import RequestValidationError
+from pydantic.error_wrappers import ErrorWrapper
 
 from auth.dependencies import get_current_user, check_user_status
 from db.crud.shifts import get_all_shifts, get_shift_by_id, \
@@ -38,8 +40,12 @@ def get_my_shifts(current_user: UserInfo = Depends(get_current_user)) -> list[Sh
 @shifts_router.post("/add", dependencies=[Depends(check_user_status)])
 def add_shift(shift: BaseShift):
     """Add new shift (required admin rights)"""
-    add_shift_db(shift.name, shift.start_date, shift.end_date)
-    return {'status': 'success', 'message': 'Shift added'}
+    try:
+        add_shift_db(shift.name, shift.start_date, shift.end_date)
+        return {'status': 'success', 'message': 'Shift added'}
+    except ValueError as e:
+        arg = 'start_date' if 'Start date must be before end date' in str(e) else 'end_date'
+        raise RequestValidationError([ErrorWrapper(e, ('body', arg))])
 
 
 @shifts_router.post("/reserve/{shift_id}")

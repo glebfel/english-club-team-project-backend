@@ -1,11 +1,18 @@
 from datetime import datetime
 
+import pytz
+
 from db.crud.users import get_user_by_email
 from db.connector import get_db
 from db.models import Shift, UserShift, ShiftReservation
 
 
 def add_shift(name: str, start_date: datetime, end_date: datetime):
+    # validate datetime
+    if start_date > end_date:
+        raise ValueError('Start date must be before end date')
+    if datetime.now(pytz.utc) > end_date:
+        raise ValueError('End date must be in the future')
     with get_db() as session:
         shift = Shift(name=name, start_date=start_date, end_date=end_date)
         session.add(shift)
