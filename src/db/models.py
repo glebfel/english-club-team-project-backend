@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -43,8 +43,8 @@ class Shift(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     participants_number = Column(Integer, nullable=False, default=0)
-    start_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
+    start_date = Column(type_=TIMESTAMP(timezone=True), nullable=False)
+    end_date = Column(type_=TIMESTAMP(timezone=True), nullable=False)
 
     users = relationship("UserShift")
 
@@ -55,7 +55,7 @@ class ShiftReservation(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     shift_id = Column(Integer, ForeignKey("shifts.id"))
     user_id = Column(Integer, ForeignKey("users.id"))
-    created_at = Column(DateTime, server_default=func.now())
+    created_at = Column(type_=TIMESTAMP(timezone=True), server_default=func.now())
     approved = Column(Boolean, default=False)
 
     shift = relationship("Shift")
@@ -91,8 +91,8 @@ class Task(Base):
     description = Column(String, nullable=False)
     author_id = Column(Integer, ForeignKey("users.id"))
     points = Column(Integer, nullable=False)
-    start_date = Column(DateTime, server_default=func.now())
-    end_date = Column(DateTime, nullable=False)
+    start_date = Column(type_=TIMESTAMP(timezone=True), server_default=func.now())
+    end_date = Column(type_=TIMESTAMP(timezone=True), nullable=False)
     is_active = Column(Boolean, default=True)
 
     responses = relationship("TaskResponse", back_populates="task")
@@ -104,7 +104,7 @@ class TaskResponse(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     task_id = Column(Integer, ForeignKey("tasks.id"))
-    response_time = Column(DateTime, server_default=func.now())
+    response_time = Column(type_=TIMESTAMP(timezone=True), server_default=func.now())
     is_approved = Column(Boolean, default=False)
     is_completed = Column(Boolean, default=False)
     is_checked = Column(Boolean, default=False)
@@ -119,4 +119,4 @@ class News(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     content = Column(String, nullable=False)
-    created_at = Column(DateTime, server_default=func.now())
+    created_at = Column(type_=TIMESTAMP(timezone=True), server_default=func.now())

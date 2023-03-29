@@ -9,12 +9,12 @@ class BaseTask(BaseModel):
     points: int
     start_date: datetime = Field(default_factory=datetime.now)
     end_date: datetime
-    is_active: bool = Field(default=True)
 
 
 class TaskInfo(BaseTask):
     id: int
     author_id: int
+    is_active: bool
 
 
 class TaskResponse(BaseModel):

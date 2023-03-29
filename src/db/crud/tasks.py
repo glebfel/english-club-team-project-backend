@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytz as pytz
 from sqlalchemy import and_
 
 from db.crud.users import get_user_by_email
@@ -8,7 +9,14 @@ from db.models import Task, TaskResponse, User
 
 
 def add_task(title: str, description: str, author_id: int, points: int,
-             start_date: datetime, end_date: datetime, is_active: bool):
+             start_date: datetime, end_date: datetime):
+
+    # validate datetime and check if task already start
+    if start_date > end_date:
+        raise ValueError('Start date must be before end date')
+    if datetime.now(pytz.utc) > end_date:
+        raise ValueError('End date must be in the future')
+    is_active = True if datetime.now(pytz.utc) > start_date else False
     with get_db() as session:
         task = Task(title=title, description=description, author_id=author_id,
                     points=points, start_date=start_date, end_date=end_date, is_active=is_active)
@@ -22,8 +30,18 @@ def get_task_by_id(task_id: int) -> Task | None:
         return session.query(Task).filter_by(id=task_id).first()
 
 
-def get_all_active_tasks() -> list[Task]:
+def get_all_tasks() -> list[Task]:
     with get_db() as session:
+        return session.query(Task).all()
+
+
+def get_all_active_tasks() -> list[Task]:
+    # get all tasks and check if they are active
+    with get_db() as session:
+        for task in get_all_tasks():
+            if task.start_date < datetime.now(pytz.utc) < task.end_date:
+                session.query(Task).filter_by(id=task.id).update({'is_active': True})
+        session.commit()
         return session.query(Task).filter_by(is_active=True).all()
 
 
