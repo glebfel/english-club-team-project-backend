@@ -102,6 +102,7 @@ class TaskResponse(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     task_id = Column(Integer, ForeignKey("tasks.id"))
+    answer = Column(String, default=None)
     response_time = Column(type_=TIMESTAMP(timezone=True), server_default=func.now())
     is_approved = Column(Boolean, default=False)
     is_completed = Column(Boolean, default=False)
