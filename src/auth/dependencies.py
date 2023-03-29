@@ -29,7 +29,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInfo:
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return UserInfo(id=user.id, first_name=user.first_name, last_name=user.last_name, email=user.email,
-                    username=user.username, is_admin=user.is_admin)
+                    username=user.username, is_admin=user.is_admin, registered_at=user.registered_at)
 
 
 async def check_user_status(user: UserInfo = Depends(get_current_user)):

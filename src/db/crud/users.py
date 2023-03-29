@@ -9,7 +9,7 @@ def get_user_by_email(email: str) -> User:
 
 def get_all_users() -> list[User]:
     with get_db() as session:
-        return session.query(User).all()
+        return session.query(User).filter_by(is_admin=False).all()
 
 
 def add_new_user(first_name: str, last_name,

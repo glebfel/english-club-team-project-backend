@@ -9,8 +9,8 @@ class UserInfo(BaseModel):
     last_name: str
     username: str
     email: EmailStr
-    points: int
-    media_link: HttpUrl
+    points: int = Field(default=0)
+    media_link: HttpUrl = Field(default=None)
     is_admin: bool
     registered_at: datetime
 
