@@ -18,6 +18,7 @@ class User(Base):
     media_link = Column(String, nullable=True)
     hashed_password = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False)
+    registered_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
     shifts = relationship("UserShift")
     achievements = relationship("UserAchievement")

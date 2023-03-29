@@ -1,15 +1,18 @@
+from datetime import datetime
+
 from pydantic import BaseModel, Field, EmailStr, HttpUrl
 
 
 class UserInfo(BaseModel):
     id: int
-    first_name: str = Field(max_length=30)
-    last_name: str = Field(max_length=30)
-    username: str = Field(max_length=30)
+    first_name: str
+    last_name: str
+    username: str
     email: EmailStr
-    points: int = Field(default=0)
-    media_link: HttpUrl = Field(default=None)
-    is_admin: bool = Field(default=False)
+    points: int
+    media_link: HttpUrl
+    is_admin: bool
+    registered_at: datetime
 
 
 class UpdateUserInfo(BaseModel):
