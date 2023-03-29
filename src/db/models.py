@@ -55,7 +55,7 @@ class ShiftReservation(Base):
     shift_id = Column(Integer, ForeignKey("shifts.id"))
     user_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(type_=TIMESTAMP(timezone=True), server_default=func.now())
-    approved = Column(Boolean, default=False)
+    is_approved = Column(Boolean, default=False)
 
     shift = relationship("Shift")
     user = relationship("User")
