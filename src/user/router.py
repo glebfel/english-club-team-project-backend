@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from db.crud.users import get_user_by_email, update_user_by_email, get_all_users
 from auth.dependencies import get_current_user, check_user_status
-from user.schemas import UserInfo, UpdateInfo
+from user.schemas import UserInfo, UpdateUserInfo
 from utils import convert_sqlalchemy_row_to_dict
 
 user_router = APIRouter(tags=["Users"], prefix='/user')
@@ -29,7 +29,7 @@ def get_me_info(current_user: UserInfo = Depends(get_current_user)) -> UserInfo:
 
 
 @user_router.put("/update-me")
-def update_my_info(user_info: UpdateInfo, current_user: UserInfo = Depends(get_current_user)):
+def update_my_info(user_info: UpdateUserInfo, current_user: UserInfo = Depends(get_current_user)):
     """Update current user info"""
     updatable_fields = {}
     for i in user_info.dict():
@@ -40,7 +40,7 @@ def update_my_info(user_info: UpdateInfo, current_user: UserInfo = Depends(get_c
 
 
 @user_router.put("/update", dependencies=[Depends(check_user_status)])
-def update_user(email: str, user_info: UpdateInfo):
+def update_user(email: str, user_info: UpdateUserInfo):
     """Update user info by email (required admin rights)"""
     updatable_fields = {}
     for i in user_info.dict():

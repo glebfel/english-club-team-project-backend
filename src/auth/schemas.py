@@ -19,8 +19,3 @@ class UserRegister(BaseModel):
     email: EmailStr
     password: str
     is_admin: bool = Field(default=False)
-
-
-class UserLogin(BaseModel):
-    email: str
-    password: str
