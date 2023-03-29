@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytz
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.exceptions import RequestValidationError
 from pydantic.error_wrappers import ErrorWrapper
@@ -20,7 +21,7 @@ shifts_router = APIRouter(tags=["Shifts"], prefix='/shifts')
 def get_upcoming_shifts() -> list[ShiftInfo]:
     """Get all upcoming shifts"""
     return [ShiftInfo(**convert_sqlalchemy_row_to_dict(shift)) for shift in get_all_shifts()
-            if shift.start_date > datetime.now()]
+            if shift.start_date > datetime.now(pytz.utc)]
 
 
 @shifts_router.get("/info/{shift_id}", dependencies=[Depends(get_current_user)])
