@@ -29,7 +29,7 @@ def get_my_tasks(current_user: UserInfo = Depends(get_current_user)) -> list[Tas
 
 @tasks_router.get('/all', dependencies=[Depends(check_user_status)])
 def get_all_tasks() -> list[TaskInfo]:
-    """Get all active tasks (by admin)"""
+    """Get all tasks (by admin)"""
     return [TaskInfo(**convert_sqlalchemy_row_to_dict(task)) for task in get_all_tasks_db()]
 
 

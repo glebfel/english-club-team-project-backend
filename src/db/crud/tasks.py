@@ -26,7 +26,7 @@ def add_task(title: str, description: str, author_id: int, points: int,
         raise ValueError('Start date must be before end date')
     if datetime.now(pytz.utc) > end_date:
         raise ValueError('End date must be in the future')
-    is_active = True if datetime.now(pytz.utc) > start_date else False
+    is_active = True if start_date < datetime.now(pytz.utc) < end_date else False
     with get_db() as session:
         task = Task(title=title, description=description, author_id=author_id,
                     points=points, start_date=start_date, end_date=end_date, is_active=is_active)
@@ -53,6 +53,8 @@ def get_all_active_tasks() -> list[Task]:
         for task in get_all_tasks():
             if task.start_date < datetime.now(pytz.utc) < task.end_date:
                 session.query(Task).filter_by(id=task.id).update({'is_active': True})
+            else:
+                session.query(Task).filter_by(id=task.id).update({'is_active': False})
         session.commit()
         return session.query(Task).filter_by(is_active=True).all()
 
