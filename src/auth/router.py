@@ -9,7 +9,7 @@ from auth.schemas import Token, UserRegister
 from config import settings
 from db.crud.users import get_user_by_email, add_new_user
 from db.models import User
-from exceptions import DatabaseNotFoundError
+from exceptions import DatabaseElementNotFoundError
 from user.schemas import UserInfo
 from utils import convert_sqlalchemy_row_to_dict
 
@@ -47,7 +47,7 @@ def register_user(user: UserRegister) -> Token:
     try:
         if get_user_by_email(email=user.email):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email is already registered")
-    except DatabaseNotFoundError:
+    except DatabaseElementNotFoundError:
         pass
 
     add_new_user(first_name=user.first_name, last_name=user.last_name,
@@ -71,7 +71,7 @@ def register_user(user: UserRegister) -> Token:
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
     try:
         user = authenticate_user(form_data.username, form_data.password)
-    except DatabaseNotFoundError:
+    except DatabaseElementNotFoundError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email or password")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(

@@ -5,7 +5,7 @@ class BaseAPIException(Exception):
         return "Something goes wrong with API-service"
 
 
-class DatabaseNotFoundError(BaseAPIException):
+class DatabaseElementNotFoundError(BaseAPIException):
     def __init__(self, msg: str):
         self.msg = msg
 

@@ -5,13 +5,13 @@ import pytz
 from db.crud.users import get_user_by_email, check_user_exist_decorator
 from db.connector import get_db
 from db.models import Shift, UserShift, ShiftReservation
-from exceptions import DatabaseNotFoundError
+from exceptions import DatabaseElementNotFoundError
 
 
 def check_shift_exist_decorator(func):
     def wrapper(shift_id: int, *args, **kwargs):
         if not get_shift_by_id(shift_id):
-            raise DatabaseNotFoundError('shift with id={} not found'.format(shift_id))
+            raise DatabaseElementNotFoundError('shift with id={} not found'.format(shift_id))
         return func(shift_id=shift_id, *args, **kwargs)
 
     return wrapper
@@ -20,7 +20,7 @@ def check_shift_exist_decorator(func):
 def get_shift_by_id(shift_id: int) -> Shift | None:
     with get_db() as session:
         if not (shift := session.query(Shift).filter(Shift.id == shift_id).first()):
-            raise DatabaseNotFoundError('Shift with id={} not found'.format(shift_id))
+            raise DatabaseElementNotFoundError('Shift with id={} not found'.format(shift_id))
         return shift
 
 
@@ -66,14 +66,14 @@ def get_shift_reservation_by_id(shift_reservation_id: int) -> ShiftReservation |
     with get_db() as session:
         if not (shifts_reservations := session.query(ShiftReservation).filter(
                 ShiftReservation.id == shift_reservation_id).first()):
-            raise DatabaseNotFoundError('Shift reservation with id={} not found'.format(shift_reservation_id))
+            raise DatabaseElementNotFoundError('Shift reservation with id={} not found'.format(shift_reservation_id))
         return shifts_reservations
 
 
 def check_shift_reservation_exist_decorator(func):
     def wrapper(shift_reservation_id: int, *args, **kwargs):
         if not get_shift_reservation_by_id(shift_reservation_id):
-            raise DatabaseNotFoundError('Shift reservation with id={} not found'.format(shift_reservation_id))
+            raise DatabaseElementNotFoundError('Shift reservation with id={} not found'.format(shift_reservation_id))
         return func(shift_reservation_id=shift_reservation_id, *args, **kwargs)
 
     return wrapper

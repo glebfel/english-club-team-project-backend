@@ -7,13 +7,13 @@ from sqlalchemy.exc import NoResultFound
 from db.crud.users import get_user_by_email
 from db.connector import get_db
 from db.models import Task, TaskResponse, User
-from exceptions import DatabaseNotFoundError
+from exceptions import DatabaseElementNotFoundError
 
 
 def check_task_exist_decorator(func):
     def wrapper(task_id: int, *args, **kwargs):
         if not get_task_by_id(task_id):
-            raise DatabaseNotFoundError('Task with id={} not found'.format(task_id))
+            raise DatabaseElementNotFoundError('Task with id={} not found'.format(task_id))
         return func(task_id=task_id, *args, **kwargs)
 
     return wrapper
@@ -38,7 +38,7 @@ def add_task(title: str, description: str, author_id: int, points: int,
 def get_task_by_id(task_id: int) -> Task | None:
     with get_db() as session:
         if not (task := session.query(Task).filter_by(id=task_id).first()):
-            raise DatabaseNotFoundError('Task with id={} not found'.format(task_id))
+            raise DatabaseElementNotFoundError('Task with id={} not found'.format(task_id))
         return task
 
 
@@ -96,7 +96,7 @@ def approve_task_response(task_response_id: int):
             session.query(TaskResponse).filter_by(id=task_response_id).update({'is_approved': True})
             session.commit()
     except NoResultFound:
-        raise DatabaseNotFoundError('Task response with id={} not found'.format(task_response_id))
+        raise DatabaseElementNotFoundError('Task response with id={} not found'.format(task_response_id))
 
 
 def submit_task(user_id: int, task_id: int):
@@ -107,7 +107,7 @@ def submit_task(user_id: int, task_id: int):
                 and_(TaskResponse.task_id == task_id, TaskResponse.user_id == user_id)).update({'is_completed': True})
             session.commit()
     except NoResultFound:
-        raise DatabaseNotFoundError('Task response to task with id={0} and user with id={1} not found'.format(task_id, user_id))
+        raise DatabaseElementNotFoundError('Task response to task with id={0} and user with id={1} not found'.format(task_id, user_id))
 
 
 def check_task(task_response_id: int):
@@ -122,7 +122,7 @@ def check_task(task_response_id: int):
             session.query(User).filter_by(id=task_response.user_id).update({'points': User.points + task.points})
             session.commit()
     except NoResultFound:
-        raise DatabaseNotFoundError(
+        raise DatabaseElementNotFoundError(
             'Task response with id={} not found'.format(task_response_id))
 
 

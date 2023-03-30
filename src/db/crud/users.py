@@ -1,12 +1,12 @@
 from db.connector import get_db
 from db.models import User
-from exceptions import DatabaseNotFoundError
+from exceptions import DatabaseElementNotFoundError
 
 
 def check_user_exist_decorator(func):
     def wrapper(email: str, *args, **kwargs):
         if not get_user_by_email(email):
-            raise DatabaseNotFoundError('User with email={} not found'.format(email))
+            raise DatabaseElementNotFoundError('User with email={} not found'.format(email))
         return func(email=email, *args, **kwargs)
 
     return wrapper
@@ -15,7 +15,7 @@ def check_user_exist_decorator(func):
 def get_user_by_email(email: str) -> User:
     with get_db() as session:
         if not (user := session.query(User).filter_by(email=email).first()):
-            raise DatabaseNotFoundError('User with email={} not found'.format(email))
+            raise DatabaseElementNotFoundError('User with email={} not found'.format(email))
         return user
 
 

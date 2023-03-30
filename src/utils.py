@@ -4,7 +4,7 @@ from fastapi.exceptions import RequestValidationError, HTTPException
 from fastapi import status
 from pydantic.error_wrappers import ErrorWrapper
 
-from exceptions import DatabaseNotFoundError
+from exceptions import DatabaseElementNotFoundError
 
 
 def convert_sqlalchemy_row_to_dict(row) -> dict:
@@ -22,7 +22,7 @@ def common_error_handler_decorator(func):
         except ValueError as e:
             arg = 'start_date' if 'Start date must be before end date' in str(e) else 'end_date'
             raise RequestValidationError([ErrorWrapper(e, ('body', arg))])
-        except DatabaseNotFoundError as e:
+        except DatabaseElementNotFoundError as e:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
     return wrapper
