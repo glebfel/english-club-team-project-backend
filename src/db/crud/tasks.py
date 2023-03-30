@@ -6,11 +6,20 @@ from sqlalchemy import and_
 from db.crud.users import get_user_by_email
 from db.connector import get_db
 from db.models import Task, TaskResponse, User
+from exceptions import DatabaseNotFoundError
+
+
+def check_task_exist_decorator(func):
+    def wrapper(task_id: int, *args, **kwargs):
+        if not get_task_by_id(task_id):
+            raise DatabaseNotFoundError('Task with id={} not found'.format(task_id))
+        return func(task_id=task_id, *args, **kwargs)
+
+    return wrapper
 
 
 def add_task(title: str, description: str, author_id: int, points: int,
              start_date: datetime, end_date: datetime):
-
     # validate datetime and check if task already start
     if start_date > end_date:
         raise ValueError('Start date must be before end date')
@@ -27,7 +36,9 @@ def add_task(title: str, description: str, author_id: int, points: int,
 
 def get_task_by_id(task_id: int) -> Task | None:
     with get_db() as session:
-        return session.query(Task).filter_by(id=task_id).first()
+        if not (task := session.query(Task).filter_by(id=task_id).first()):
+            raise DatabaseNotFoundError('Task with id={} not found'.format(task_id))
+        return task
 
 
 def get_all_tasks() -> list[Task]:
@@ -56,6 +67,7 @@ def get_user_tasks_by_email(email: str) -> list[Task]:
         return tasks
 
 
+@check_task_exist_decorator
 def response_to_task(task_id: int, user_id: int):
     with get_db() as session:
         response = TaskResponse(task_id=task_id, user_id=user_id)
@@ -71,7 +83,9 @@ def get_all_not_approved_tasks_responses() -> list[TaskResponse]:
 
 def get_all_not_unchecked_tasks_responses() -> list[TaskResponse]:
     with get_db() as session:
-        return session.query(TaskResponse).filter_by(and_(TaskResponse.is_approved==True, TaskResponse.is_completed==True, TaskResponse.is_checked==False)).all()
+        return session.query(TaskResponse).filter_by(
+            and_(TaskResponse.is_approved == True, TaskResponse.is_completed == True,
+                 TaskResponse.is_checked == False)).all()
 
 
 def approve_task_response(task_response_id: int):
@@ -84,7 +98,8 @@ def approve_task_response(task_response_id: int):
 def submit_task(user_id: int, task_id: int):
     with get_db() as session:
         # update completed status
-        session.query(TaskResponse).filter(and_(TaskResponse.task_id==task_id, TaskResponse.user_id==user_id)).update({'is_completed': True})
+        session.query(TaskResponse).filter(
+            and_(TaskResponse.task_id == task_id, TaskResponse.user_id == user_id)).update({'is_completed': True})
         session.commit()
 
 
@@ -100,6 +115,7 @@ def check_task(task_response_id: int):
         session.commit()
 
 
+@check_task_exist_decorator
 def remove_task(task_id: int):
     with get_db() as session:
         session.query(Task).filter_by(id=task_id).delete()

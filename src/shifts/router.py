@@ -10,6 +10,7 @@ from db.crud.shifts import get_all_shifts, get_shift_by_id, \
     add_shift as add_shift_db, get_user_shifts_by_email, \
     approve_shift_reservation as approve_shift_reservation_db, reserve_shift as reserve_shift_db, \
     get_shifts_reservations
+from exceptions import DatabaseNotFoundError
 from shifts.schemas import ShiftInfo, ShiftReservation, BaseShift
 from user.schemas import UserInfo
 from utils import convert_sqlalchemy_row_to_dict
@@ -27,8 +28,10 @@ def get_upcoming_shifts() -> list[ShiftInfo]:
 @shifts_router.get("/info/{shift_id}", dependencies=[Depends(get_current_user)])
 def get_shift_info(shift_id: int) -> ShiftInfo:
     """Get shift info by id"""
-    if not (shift := get_shift_by_id(shift_id)):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Shift not found")
+    try:
+        shift = get_shift_by_id(shift_id)
+    except DatabaseNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     return ShiftInfo(**convert_sqlalchemy_row_to_dict(shift))
 
 
@@ -52,7 +55,10 @@ def add_shift(shift: BaseShift):
 @shifts_router.post("/reserve/{shift_id}")
 def reserve_shift(shift_id: int, current_user: UserInfo = Depends(get_current_user)):
     """Reserve shift """
-    reserve_shift_db(shift_id=shift_id, user_id=current_user.id)
+    try:
+        reserve_shift_db(shift_id=shift_id, user_id=current_user.id)
+    except DatabaseNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     return {'status': 'success', 'message': 'Shift reservation sent for approval'}
 
 
@@ -65,5 +71,8 @@ def show_shift_reservations() -> list[ShiftReservation]:
 @shifts_router.put("/approve/{shift_reservation_id}", dependencies=[Depends(check_user_status)])
 def approve_shift_reservation(shift_reservation_id: int, ):
     """Approve shift reservation (required admin rights)"""
-    approve_shift_reservation_db(shift_reservation_id=shift_reservation_id)
+    try:
+        approve_shift_reservation_db(shift_reservation_id=shift_reservation_id)
+    except DatabaseNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     return {'status': 'success', 'message': 'Shift reservation approved'}
