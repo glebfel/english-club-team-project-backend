@@ -7,8 +7,9 @@ from utils import convert_sqlalchemy_row_to_dict, common_error_handler_decorator
 
 user_router = APIRouter(tags=["Users"], prefix='/user')
 
-@common_error_handler_decorator
+
 @user_router.get("/info/{email}", dependencies=[Depends(check_user_status)])
+@common_error_handler_decorator
 def get_user_info(email: str) -> UserInfo:
     """Get user info by email (required admin rights)"""
     return UserInfo(**convert_sqlalchemy_row_to_dict(get_user_by_email(email)))
@@ -37,8 +38,8 @@ def update_my_info(user_info: UpdateUserInfo, current_user: UserInfo = Depends(g
     return {'status': 'success', 'message': 'User info updated'}
 
 
-@common_error_handler_decorator
 @user_router.put("/update", dependencies=[Depends(check_user_status)])
+@common_error_handler_decorator
 def update_user(email: str, user_info: UpdateUserInfo):
     """Update user info by email (required admin rights)"""
     updatable_fields = {}

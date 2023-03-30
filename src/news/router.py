@@ -21,8 +21,8 @@ def add_news(news: NewsBase):
     return {'status': 'success', 'message': 'News added'}
 
 
-@common_error_handler_decorator
 @news_router.get("/info/{news_id}", dependencies=[Depends(get_current_user)])
+@common_error_handler_decorator
 def get_news_info_by_id(news_id: int) -> NewsInfo:
     """Get news info"""
     return NewsInfo(**convert_sqlalchemy_row_to_dict(get_news_by_id(news_id)))

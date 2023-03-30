@@ -26,8 +26,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInfo:
             headers={"WWW-Authenticate": "Bearer"},
         )
     user = get_user_by_email(email)
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
     return UserInfo(id=user.id, first_name=user.first_name, last_name=user.last_name, email=user.email,
                     username=user.username, is_admin=user.is_admin, registered_at=user.registered_at)
 

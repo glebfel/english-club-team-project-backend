@@ -22,8 +22,8 @@ def get_upcoming_shifts() -> list[ShiftInfo]:
             if shift.start_date > datetime.now(pytz.utc)]
 
 
-@common_error_handler_decorator
 @shifts_router.get("/info/{shift_id}", dependencies=[Depends(get_current_user)])
+@common_error_handler_decorator
 def get_shift_info(shift_id: int) -> ShiftInfo:
     """Get shift info by id"""
     return ShiftInfo(**convert_sqlalchemy_row_to_dict(get_shift_by_id(shift_id)))
@@ -36,16 +36,16 @@ def get_my_shifts(current_user: UserInfo = Depends(get_current_user)) -> list[Sh
             get_user_shifts_by_email(current_user.email)]
 
 
-@common_error_handler_decorator
 @shifts_router.post("/add", dependencies=[Depends(check_user_status)])
+@common_error_handler_decorator
 def add_shift(shift: BaseShift):
     """Add new shift (required admin rights)"""
     add_shift_db(shift.name, shift.start_date, shift.end_date)
     return {'status': 'success', 'message': 'Shift added'}
 
 
-@common_error_handler_decorator
 @shifts_router.post("/reserve/{shift_id}")
+@common_error_handler_decorator
 def reserve_shift(shift_id: int, current_user: UserInfo = Depends(get_current_user)):
     """Reserve shift """
     reserve_shift_db(shift_id=shift_id, user_id=current_user.id)
@@ -59,8 +59,8 @@ def show_shift_reservations() -> list[ShiftReservation]:
             get_shifts_reservations()]
 
 
-@common_error_handler_decorator
 @shifts_router.put("/approve/{shift_reservation_id}", dependencies=[Depends(check_user_status)])
+@common_error_handler_decorator
 def approve_shift_reservation(shift_reservation_id: int, ):
     """Approve shift reservation (required admin rights)"""
     approve_shift_reservation_db(shift_reservation_id=shift_reservation_id)

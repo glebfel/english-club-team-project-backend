@@ -1,3 +1,5 @@
+from functools import wraps
+
 from fastapi.exceptions import RequestValidationError, HTTPException
 from fastapi import status
 from pydantic.error_wrappers import ErrorWrapper
@@ -13,6 +15,7 @@ def convert_sqlalchemy_row_to_dict(row) -> dict:
 
 
 def common_error_handler_decorator(func):
+    @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
