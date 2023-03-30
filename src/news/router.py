@@ -14,15 +14,15 @@ def get_all_news() -> list[NewsInfo]:
     return [NewsInfo(id=i.id, title=i.title, content=i.content, created_at=i.created_at) for i in get_news_db()]
 
 
-@news_router.post("/add", dependencies=[Depends(check_user_status)])
-def add_news(news: NewsBase):
-    """Add new news (required admin rights)"""
-    add_news_db(news.title, news.content)
-    return {'status': 'success', 'message': 'News added'}
-
-
 @news_router.get("/info/{news_id}", dependencies=[Depends(get_current_user)])
 @common_error_handler_decorator
 def get_news_info_by_id(news_id: int) -> NewsInfo:
     """Get news info"""
     return NewsInfo(**convert_sqlalchemy_row_to_dict(get_news_by_id(news_id)))
+
+
+@news_router.post("/add", dependencies=[Depends(check_user_status)])
+def add_news(news: NewsBase):
+    """Add new news (required admin rights)"""
+    add_news_db(news.title, news.content)
+    return {'status': 'success', 'message': 'News added'}

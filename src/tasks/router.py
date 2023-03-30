@@ -13,14 +13,6 @@ from utils import convert_sqlalchemy_row_to_dict, common_error_handler_decorator
 tasks_router = APIRouter(tags=["Tasks"], prefix='/tasks')
 
 
-@tasks_router.post('/add')
-@common_error_handler_decorator
-def add_task(task: BaseTask, current_user: UserInfo = Depends(check_user_status)):
-    """Add new task (by admin)"""
-    add_task_db(**task.dict(), author_id=current_user.id)
-    return {'status': 'success', 'message': 'Task added'}
-
-
 @tasks_router.get("/my")
 def get_my_tasks(current_user: UserInfo = Depends(get_current_user)) -> list[TaskInfo]:
     """Get tasks for current user"""
@@ -53,6 +45,21 @@ def get_task(task_id: int) -> TaskInfo:
     return TaskInfo(**convert_sqlalchemy_row_to_dict(get_task_by_id(task_id)))
 
 
+@tasks_router.get("/responses/for_check", dependencies=[Depends(check_user_status)])
+def get_not_checked_responses() -> list[TaskResponse]:
+    """Get all not approved responses (by admin)"""
+    return [TaskResponse(**convert_sqlalchemy_row_to_dict(response)) for response in
+            get_all_not_approved_tasks_responses()]
+
+
+@tasks_router.post('/add')
+@common_error_handler_decorator
+def add_task(task: BaseTask, current_user: UserInfo = Depends(check_user_status)):
+    """Add new task (by admin)"""
+    add_task_db(**task.dict(), author_id=current_user.id)
+    return {'status': 'success', 'message': 'Task added'}
+
+
 @tasks_router.post('/response/{task_id}')
 @common_error_handler_decorator
 def response_to_task(task_id: int, current_user: UserInfo = Depends(get_current_user)):
@@ -75,14 +82,6 @@ def submit_task(task_id: int, current_user: UserInfo = Depends(get_current_user)
     """Submit task (by user)"""
     submit_task_db(current_user.id, task_id)
     return {'status': 'success', 'message': 'Task submitted'}
-
-
-@tasks_router.get("/responses/for_check", dependencies=[Depends(check_user_status)])
-def get_not_checked_responses() -> list[TaskResponse]:
-    """Get all not approved responses (by admin)"""
-    return [TaskResponse(**convert_sqlalchemy_row_to_dict(response)) for response in
-            get_all_not_approved_tasks_responses()]
-
 
 @tasks_router.put('/check/{task_response_id}', dependencies=[Depends(get_current_user)])
 @common_error_handler_decorator

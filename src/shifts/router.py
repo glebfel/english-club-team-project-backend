@@ -36,6 +36,13 @@ def get_my_shifts(current_user: UserInfo = Depends(get_current_user)) -> list[Sh
             get_user_shifts_by_email(current_user.email)]
 
 
+@shifts_router.get("/reservations")
+def show_shift_reservations() -> list[ShiftReservation]:
+    """Show all shifts reservations (required admin rights)"""
+    return [ShiftReservation(**convert_sqlalchemy_row_to_dict(reservation)) for reservation in
+            get_shifts_reservations()]
+
+
 @shifts_router.post("/add", dependencies=[Depends(check_user_status)])
 @common_error_handler_decorator
 def add_shift(shift: BaseShift):
@@ -50,13 +57,6 @@ def reserve_shift(shift_id: int, current_user: UserInfo = Depends(get_current_us
     """Reserve shift """
     reserve_shift_db(shift_id=shift_id, user_id=current_user.id)
     return {'status': 'success', 'message': 'Shift reservation sent for approval'}
-
-
-@shifts_router.get("/reservations")
-def show_shift_reservations() -> list[ShiftReservation]:
-    """Show all shifts reservations (required admin rights)"""
-    return [ShiftReservation(**convert_sqlalchemy_row_to_dict(reservation)) for reservation in
-            get_shifts_reservations()]
 
 
 @shifts_router.put("/approve/{shift_reservation_id}", dependencies=[Depends(check_user_status)])
