@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytz as pytz
 from sqlalchemy import and_
+from sqlalchemy.exc import NoResultFound
 
 from db.crud.users import get_user_by_email
 from db.connector import get_db
@@ -89,30 +90,40 @@ def get_all_not_unchecked_tasks_responses() -> list[TaskResponse]:
 
 
 def approve_task_response(task_response_id: int):
-    with get_db() as session:
-        # update approve status
-        session.query(TaskResponse).filter_by(id=task_response_id).update({'is_approved': True})
-        session.commit()
+    try:
+        with get_db() as session:
+            # update approve status
+            session.query(TaskResponse).filter_by(id=task_response_id).update({'is_approved': True})
+            session.commit()
+    except NoResultFound:
+        raise DatabaseNotFoundError('Task response with id={} not found'.format(task_response_id))
 
 
 def submit_task(user_id: int, task_id: int):
-    with get_db() as session:
-        # update completed status
-        session.query(TaskResponse).filter(
-            and_(TaskResponse.task_id == task_id, TaskResponse.user_id == user_id)).update({'is_completed': True})
-        session.commit()
+    try:
+        with get_db() as session:
+            # update completed status
+            session.query(TaskResponse).filter(
+                and_(TaskResponse.task_id == task_id, TaskResponse.user_id == user_id)).update({'is_completed': True})
+            session.commit()
+    except NoResultFound:
+        raise DatabaseNotFoundError('Task response to task with id={0} and user with id={1} not found'.format(task_id, user_id))
 
 
 def check_task(task_response_id: int):
-    with get_db() as session:
-        # update checked status
-        task_response_query = session.query(TaskResponse).filter_by(id=task_response_id)
-        task_response_query.update({'is_checked': True})
-        # update user scores
-        task_response = task_response_query.first()
-        task = session.query(Task).filter_by(id=task_response.task_id).first()
-        session.query(User).filter_by(id=task_response.user_id).update({'points': User.points + task.points})
-        session.commit()
+    try:
+        with get_db() as session:
+            # update checked status
+            task_response_query = session.query(TaskResponse).filter_by(id=task_response_id)
+            task_response_query.update({'is_checked': True})
+            # update user scores
+            task_response = task_response_query.first()
+            task = session.query(Task).filter_by(id=task_response.task_id).first()
+            session.query(User).filter_by(id=task_response.user_id).update({'points': User.points + task.points})
+            session.commit()
+    except NoResultFound:
+        raise DatabaseNotFoundError(
+            'Task response with id={} not found'.format(task_response_id))
 
 
 @check_task_exist_decorator

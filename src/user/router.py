@@ -3,17 +3,15 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from db.crud.users import get_user_by_email, update_user_by_email, get_all_users
 from auth.dependencies import get_current_user, check_user_status
 from user.schemas import UserInfo, UpdateUserInfo
-from utils import convert_sqlalchemy_row_to_dict
+from utils import convert_sqlalchemy_row_to_dict, common_error_handler_decorator
 
 user_router = APIRouter(tags=["Users"], prefix='/user')
 
-
+@common_error_handler_decorator
 @user_router.get("/info/{email}", dependencies=[Depends(check_user_status)])
 def get_user_info(email: str) -> UserInfo:
     """Get user info by email (required admin rights)"""
-    if not (user := get_user_by_email(email)):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    return UserInfo(**convert_sqlalchemy_row_to_dict(user))
+    return UserInfo(**convert_sqlalchemy_row_to_dict(get_user_by_email(email)))
 
 
 @user_router.get("/all", dependencies=[Depends(check_user_status)])
@@ -39,6 +37,7 @@ def update_my_info(user_info: UpdateUserInfo, current_user: UserInfo = Depends(g
     return {'status': 'success', 'message': 'User info updated'}
 
 
+@common_error_handler_decorator
 @user_router.put("/update", dependencies=[Depends(check_user_status)])
 def update_user(email: str, user_info: UpdateUserInfo):
     """Update user info by email (required admin rights)"""

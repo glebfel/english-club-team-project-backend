@@ -45,8 +45,7 @@ def create_access_token(data: dict, expires_delta: timedelta) -> str:
 @auth_router.post("/register")
 def register_user(user: UserRegister) -> Token:
     # check if user already in db
-    db_user = get_user_by_email(email=user.email)
-    if db_user:
+    if get_user_by_email(email=user.email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email is already registered")
     add_new_user(first_name=user.first_name, last_name=user.last_name,
                  email=user.email, username=user.username,
@@ -67,8 +66,7 @@ def register_user(user: UserRegister) -> Token:
 
 @auth_router.post("/login")
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
-    user = authenticate_user(form_data.username, form_data.password)
-    if not user:
+    if not (user := authenticate_user(form_data.username, form_data.password)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email or password")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
