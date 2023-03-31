@@ -5,8 +5,9 @@ from db.crud.tasks import get_user_tasks_by_email, get_task_by_id, \
     get_all_active_tasks as get_all_active_tasks_db, \
     response_to_task as response_to_task_db, approve_task_response as approve_task_response_db, \
     get_all_not_approved_tasks_responses, submit_task as submit_task_db, \
-    check_task as check_task_db, add_task as add_task_db, get_all_tasks as get_all_tasks_db
-from tasks.schemas import TaskInfo, TaskResponse, BaseTask
+    check_task as check_task_db, add_task as add_task_db, get_all_tasks as get_all_tasks_db, \
+    get_all_not_checked_tasks_responses
+from tasks.schemas import TaskInfo, TaskResponse, BaseTask, TaskAnswer
 from user.schemas import UserInfo
 from utils import convert_sqlalchemy_row_to_dict, common_error_handler_decorator
 
@@ -31,7 +32,7 @@ def get_all_active_tasks() -> list[TaskInfo]:
     return [TaskInfo(**convert_sqlalchemy_row_to_dict(task)) for task in get_all_active_tasks_db()]
 
 
-@tasks_router.get("/responses", dependencies=[Depends(check_user_status)])
+@tasks_router.get("/response/list/for_approval", dependencies=[Depends(check_user_status)])
 def get_not_approved_responses() -> list[TaskResponse]:
     """Get all not approved responses (by admin)"""
     return [TaskResponse(**convert_sqlalchemy_row_to_dict(response)) for response in
@@ -45,11 +46,11 @@ def get_task(task_id: int) -> TaskInfo:
     return TaskInfo(**convert_sqlalchemy_row_to_dict(get_task_by_id(task_id)))
 
 
-@tasks_router.get("/responses/for_check", dependencies=[Depends(check_user_status)])
+@tasks_router.get("/response/list/for_check", dependencies=[Depends(check_user_status)])
 def get_not_checked_responses() -> list[TaskResponse]:
     """Get all not approved responses (by admin)"""
     return [TaskResponse(**convert_sqlalchemy_row_to_dict(response)) for response in
-            get_all_not_approved_tasks_responses()]
+            get_all_not_checked_tasks_responses()]
 
 
 @tasks_router.post('/add')
@@ -68,7 +69,7 @@ def response_to_task(task_id: int, current_user: UserInfo = Depends(get_current_
     return {'status': 'success', 'message': 'Task response sent'}
 
 
-@tasks_router.put('/responses/approve/{task_response_id}', dependencies=[Depends(check_user_status)])
+@tasks_router.put('/response/approve/{task_response_id}', dependencies=[Depends(check_user_status)])
 @common_error_handler_decorator
 def approve_response(task_response_id: int):
     """Approve user task response (by admin)"""
@@ -78,10 +79,11 @@ def approve_response(task_response_id: int):
 
 @tasks_router.put('/submit/{task_id}')
 @common_error_handler_decorator
-def submit_task(task_id: int, current_user: UserInfo = Depends(get_current_user)):
+def submit_task(task_id: int, task_answer: TaskAnswer, current_user: UserInfo = Depends(get_current_user)):
     """Submit task (by user)"""
-    submit_task_db(current_user.id, task_id)
+    submit_task_db(current_user.id, task_id, task_answer.answer)
     return {'status': 'success', 'message': 'Task submitted'}
+
 
 @tasks_router.put('/check/{task_response_id}', dependencies=[Depends(get_current_user)])
 @common_error_handler_decorator

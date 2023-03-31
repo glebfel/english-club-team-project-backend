@@ -17,9 +17,13 @@ class TaskInfo(BaseTask):
     is_active: bool
 
 
+class TaskAnswer(BaseModel):
+    answer: str
+
+
 class TaskResponse(BaseModel):
     id: int
-    answer: str
+    answer: str = Field(default=None)
     user_id: str
     task_id: int
     response_time: datetime
