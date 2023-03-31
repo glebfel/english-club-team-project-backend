@@ -2,6 +2,8 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+from user.schemas import UserInfo
+
 
 class BaseShift(BaseModel):
     name: str
@@ -18,6 +20,6 @@ class ShiftInfo(BaseShift):
 
 class ShiftReservation(BaseModel):
     id: int
-    shift_id: int
-    user_id: int
+    user_info: UserInfo
+    shift_info: ShiftInfo
     is_approved: bool

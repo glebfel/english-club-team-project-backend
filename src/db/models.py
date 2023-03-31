@@ -10,7 +10,7 @@ class TaskResponse(Base):
     __tablename__ = 'task_responses'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_email = Column(String, ForeignKey('users.email'))
     task_id = Column(Integer, ForeignKey('tasks.id'))
     answer = Column(String, default=None)
     response_time = Column(type_=TIMESTAMP(timezone=True), server_default=func.now())
@@ -24,7 +24,7 @@ class ShiftReservation(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     shift_id = Column(Integer, ForeignKey('shifts.id'))
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_email = Column(String, ForeignKey('users.email'))
     created_at = Column(type_=TIMESTAMP(timezone=True), server_default=func.now())
     is_approved = Column(Boolean, default=False)
 
@@ -33,7 +33,7 @@ class UserAchievement(Base):
     __tablename__ = 'user_achievements'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_email = Column(String, ForeignKey('users.email'))
     achievement_id = Column(Integer, ForeignKey('achievements.id'))
 
 
@@ -41,7 +41,7 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    email = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     username = Column(String, nullable=False)
@@ -76,7 +76,7 @@ class Task(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    author_id = Column(Integer, ForeignKey("users.id"))
+    author_email = Column(String, ForeignKey("users.email"))
     points = Column(Integer, nullable=False)
     start_date = Column(type_=TIMESTAMP(timezone=True), server_default=func.now())
     end_date = Column(type_=TIMESTAMP(timezone=True), nullable=False)

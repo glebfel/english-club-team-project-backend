@@ -113,13 +113,14 @@ def approve_task_response(task_response_id: int):
         raise DatabaseElementNotFoundError('Task response with id={} not found'.format(task_response_id))
 
 
-def submit_task(user_id: int, task_id: int, task_answer: str):
+def submit_task(user_email: str, task_id: int, task_answer: str):
     try:
         with get_db() as session:
             # update completed status
             session.query(TaskResponse).filter(
-                and_(TaskResponse.task_id == task_id, TaskResponse.user_id == user_id)).update({'is_completed': True,
-                                                                                                'answer': task_answer})
+                and_(TaskResponse.task_id == task_id, TaskResponse.user_email == user_email)).update(
+                {'is_completed': True,
+                 'answer': task_answer})
             session.commit()
     except NoResultFound:
         raise DatabaseElementNotFoundError(

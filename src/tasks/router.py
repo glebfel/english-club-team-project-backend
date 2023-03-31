@@ -57,7 +57,7 @@ def get_not_checked_responses() -> list[TaskResponse]:
 @common_error_handler_decorator
 def add_task(task: BaseTask, current_user: UserInfo = Depends(check_user_status)):
     """Add new task (by admin)"""
-    add_task_db(**task.dict(), author_id=current_user.id)
+    add_task_db(**task.dict(), author_email=current_user.email)
     return {'status': 'success', 'message': 'Task added'}
 
 
@@ -81,7 +81,7 @@ def approve_response(task_response_id: int):
 @common_error_handler_decorator
 def submit_task(task_id: int, task_answer: TaskAnswer, current_user: UserInfo = Depends(get_current_user)):
     """Submit task (by user)"""
-    submit_task_db(current_user.id, task_id, task_answer.answer)
+    submit_task_db(current_user.email, task_id, task_answer.answer)
     return {'status': 'success', 'message': 'Task submitted'}
 
 

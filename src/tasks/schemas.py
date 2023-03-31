@@ -13,7 +13,7 @@ class BaseTask(BaseModel):
 
 class TaskInfo(BaseTask):
     id: int
-    author_id: int
+    author_email: str
     is_active: bool
 
 
@@ -24,7 +24,7 @@ class TaskAnswer(BaseModel):
 class TaskResponse(BaseModel):
     id: int
     answer: str = Field(default=None)
-    user_id: str
+    user_email: str
     task_id: int
     response_time: datetime
     is_approved: bool

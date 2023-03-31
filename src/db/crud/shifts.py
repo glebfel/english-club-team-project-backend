@@ -6,6 +6,9 @@ from db.connector import get_db
 from db.crud.users import get_user_by_email
 from db.models import Shift, ShiftReservation, User
 from exceptions import DatabaseElementNotFoundError
+from shifts.schemas import ShiftReservation as ShiftReservationAPI, ShiftInfo as ShiftInfoAPI
+from user.schemas import UserInfo as UserInfoAPI
+from utils import convert_sqlalchemy_row_to_dict
 
 
 def check_shift_exist_decorator(func):
@@ -48,7 +51,7 @@ def get_user_shifts_by_email(email: str) -> list[Shift]:
         user = get_user_by_email(email)
         # extract all shift reservations ids
         shift_reservations_ids = [_.shift_id for _ in session.query(ShiftReservation).filter(
-            (ShiftReservation.user_id == user.id) & (ShiftReservation.is_approved == True)).all()]
+            (ShiftReservation.user_email == user.email) & (ShiftReservation.is_approved == True)).all()]
         # extract info about each shift
         shifts = session.query(Shift).filter(Shift.id.in_(shift_reservations_ids)).all()
         return shifts
@@ -91,11 +94,20 @@ def approve_shift_reservation(shift_reservation_id: int):
         session.commit()
 
 
-def get_shifts_reservations() -> list[ShiftReservation]:
+def get_shifts_reservations() -> list[ShiftReservationAPI]:
     with get_db() as session:
         # update shift participant count
+        result = []
         shifts_reservations = session.query(ShiftReservation).filter_by(is_approved=False).all()
-        return shifts_reservations
+        for reservation in shifts_reservations:
+            user_info = get_user_by_email(reservation.user_email)
+            shift_info = get_shift_by_id(reservation.shift_id)
+            result.append(ShiftReservationAPI(id=reservation.id,
+                                              is_approved=reservation.is_approved,
+                                              user_info=UserInfoAPI(**convert_sqlalchemy_row_to_dict(user_info)),
+                                              shift_info=ShiftInfoAPI(**convert_sqlalchemy_row_to_dict(shift_info))))
+
+        return result
 
 
 @check_shift_exist_decorator
