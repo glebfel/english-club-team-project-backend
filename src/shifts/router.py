@@ -55,7 +55,7 @@ def add_shift(shift: BaseShift):
 @common_error_handler_decorator
 def reserve_shift(shift_id: int, current_user: UserInfo = Depends(get_current_user)):
     """Reserve shift """
-    reserve_shift_db(shift_id=shift_id, user_id=current_user.id)
+    reserve_shift_db(shift_id=shift_id, user_email=current_user.email)
     return {'status': 'success', 'message': 'Shift reservation sent for approval'}
 
 
