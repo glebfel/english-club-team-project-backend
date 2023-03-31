@@ -4,7 +4,7 @@ import pytz
 
 from db.connector import get_db
 from db.crud.users import get_user_by_email
-from db.models import Shift, ShiftReservation
+from db.models import Shift, ShiftReservation, User
 from exceptions import DatabaseElementNotFoundError
 
 
@@ -57,10 +57,10 @@ def get_user_shifts_by_email(email: str) -> list[Shift]:
 @check_shift_exist_decorator
 def reserve_shift(shift_id: int, user_email: str):
     with get_db() as session:
-        user = get_user_by_email(user_email)
-        user.shifts.append(get_shift_by_id(shift_id))
+        user = session.query(User).filter_by(email=user_email).first()
+        shift = session.query(Shift).filter_by(id=shift_id).first()
+        user.shifts.append(shift)
         session.commit()
-        session.refresh(user)
 
 
 def get_shift_reservation_by_id(shift_reservation_id: int) -> ShiftReservation | None:
