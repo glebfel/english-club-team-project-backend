@@ -38,7 +38,7 @@ def get_my_shifts(current_user: UserInfo = Depends(get_current_user)) -> list[Sh
 
 @shifts_router.get("/reservations")
 def show_shift_reservations() -> list[ShiftReservation]:
-    """Show all shifts reservations (required admin rights)"""
+    """Show all (not approved) shifts reservations (required admin rights)"""
     return [ShiftReservation(**convert_sqlalchemy_row_to_dict(reservation)) for reservation in
             get_shifts_reservations()]
 

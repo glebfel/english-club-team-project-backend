@@ -87,14 +87,14 @@ def approve_shift_reservation(shift_reservation_id: int):
         session.query(ShiftReservation).filter_by(id=shift_reservation_id).update({'is_approved': True})
         # update shift participant count
         shift_id = session.query(ShiftReservation).filter_by(id=shift_reservation_id).first().shift_id
-        session.query(Shift).filter_by(id=shift_id).update({'participant_count': Shift.participant_count + 1})
+        session.query(Shift).filter_by(id=shift_id).update({'participants_number': Shift.participants_number + 1})
         session.commit()
 
 
 def get_shifts_reservations() -> list[ShiftReservation]:
     with get_db() as session:
         # update shift participant count
-        shifts_reservations = session.query(ShiftReservation).all()
+        shifts_reservations = session.query(ShiftReservation).filter_by(is_approved=False).all()
         return shifts_reservations
 
 
