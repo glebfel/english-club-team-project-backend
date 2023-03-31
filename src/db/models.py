@@ -41,6 +41,8 @@ class Shift(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
+    number = Column(String, nullable=False)
+    description = Column(String, nullable=False)
     participants_number = Column(Integer, nullable=False, default=0)
     start_date = Column(type_=TIMESTAMP(timezone=True), nullable=False)
     end_date = Column(type_=TIMESTAMP(timezone=True), nullable=False)

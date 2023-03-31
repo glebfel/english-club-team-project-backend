@@ -47,7 +47,7 @@ def show_shift_reservations() -> list[ShiftReservation]:
 @common_error_handler_decorator
 def add_shift(shift: BaseShift):
     """Add new shift (required admin rights)"""
-    add_shift_db(shift.name, shift.start_date, shift.end_date)
+    add_shift_db(**shift.dict())
     return {'status': 'success', 'message': 'Shift added'}
 
 

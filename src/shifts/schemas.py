@@ -5,6 +5,8 @@ from pydantic import BaseModel
 
 class BaseShift(BaseModel):
     name: str
+    number: str
+    description: str
     start_date: datetime
     end_date: datetime
 
