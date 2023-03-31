@@ -1,9 +1,40 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 Base = declarative_base()
+
+
+class TaskResponse(Base):
+    __tablename__ = 'task_responses'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    task_id = Column(Integer, ForeignKey('tasks.id'))
+    answer = Column(String, default=None)
+    response_time = Column(type_=TIMESTAMP(timezone=True), server_default=func.now())
+    is_approved = Column(Boolean, default=False)
+    is_completed = Column(Boolean, default=False)
+    is_checked = Column(Boolean, default=False)
+
+
+class ShiftReservation(Base):
+    __tablename__ = 'shift_reservations'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    shift_id = Column(Integer, ForeignKey('shifts.id'))
+    user_id = Column(Integer, ForeignKey('users.id'))
+    created_at = Column(type_=TIMESTAMP(timezone=True), server_default=func.now())
+    is_approved = Column(Boolean, default=False)
+
+
+class UserAchievement(Base):
+    __tablename__ = 'user_achievements'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    achievement_id = Column(Integer, ForeignKey('achievements.id'))
 
 
 class User(Base):
@@ -20,20 +51,9 @@ class User(Base):
     is_admin = Column(Boolean, default=False)
     registered_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
 
-    shifts = relationship("UserShift")
-    achievements = relationship("UserAchievement")
-    task_responses = relationship("TaskResponse")
-
-
-class UserShift(Base):
-    __tablename__ = "user_shifts"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    shift_id = Column(Integer, ForeignKey("shifts.id"))
-
-    user = relationship("User", back_populates="shifts")
-    camp = relationship("Shift", back_populates="users")
+    shifts = relationship('Shift', secondary='shift_reservations', back_populates='users')
+    tasks = relationship('Task', secondary='task_responses', back_populates='users')
+    achievements = relationship('Achievement', secondary='user_achievements', back_populates='users')
 
 
 class Shift(Base):
@@ -47,41 +67,7 @@ class Shift(Base):
     start_date = Column(type_=TIMESTAMP(timezone=True), nullable=False)
     end_date = Column(type_=TIMESTAMP(timezone=True), nullable=False)
 
-    users = relationship("UserShift")
-
-
-class ShiftReservation(Base):
-    __tablename__ = "shift_reservations"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    shift_id = Column(Integer, ForeignKey("shifts.id"))
-    user_id = Column(Integer, ForeignKey("users.id"))
-    created_at = Column(type_=TIMESTAMP(timezone=True), server_default=func.now())
-    is_approved = Column(Boolean, default=False)
-
-    shift = relationship("Shift")
-    user = relationship("User")
-
-
-class UserAchievement(Base):
-    __tablename__ = "user_achievements"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    achievement_id = Column(Integer, ForeignKey("achievements.id"))
-
-    user = relationship("User", back_populates="achievements")
-    achievement = relationship("Achievement", back_populates="users")
-
-
-class Achievement(Base):
-    __tablename__ = "achievements"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    description = Column(String, nullable=False)
-
-    users = relationship("UserAchievement")
+    users = relationship('User', secondary='shift_reservations', back_populates='shifts')
 
 
 class Task(Base):
@@ -96,23 +82,17 @@ class Task(Base):
     end_date = Column(type_=TIMESTAMP(timezone=True), nullable=False)
     is_active = Column(Boolean, default=True)
 
-    responses = relationship("TaskResponse", back_populates="task")
+    users = relationship('User', secondary='task_responses', back_populates='tasks')
 
 
-class TaskResponse(Base):
-    __tablename__ = "task_responses"
+class Achievement(Base):
+    __tablename__ = 'achievements'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    task_id = Column(Integer, ForeignKey("tasks.id"))
-    answer = Column(String, default=None)
-    response_time = Column(type_=TIMESTAMP(timezone=True), server_default=func.now())
-    is_approved = Column(Boolean, default=False)
-    is_completed = Column(Boolean, default=False)
-    is_checked = Column(Boolean, default=False)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=False)
 
-    user = relationship("User")
-    task = relationship("Task")
+    users = relationship('User', secondary='user_achievements', back_populates='achievements')
 
 
 class News(Base):
