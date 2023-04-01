@@ -97,8 +97,7 @@ def get_all_not_approved_tasks_responses() -> list[TaskResponse]:
 
 def get_all_not_checked_tasks_responses() -> list[TaskResponse]:
     with get_db() as session:
-        return session.query(TaskResponse).filter(
-            (TaskResponse.is_approved == True) & (TaskResponse.is_completed == True) &
+        return session.query(TaskResponse).filter((TaskResponse.is_completed == True) &
             (TaskResponse.is_checked == False)).all()
 
 
