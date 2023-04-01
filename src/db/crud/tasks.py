@@ -71,7 +71,7 @@ def get_user_tasks_by_email(email: str) -> list[Task]:
     with get_db() as session:
         # get user id
         user = session.query(User).filter_by(email=email).first()
-        return user.tasks
+        return [task for task in user.tasks if task.is_active == True]
 
 
 @check_task_exist_decorator
