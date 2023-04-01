@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 
-from db.crud.users import get_user_by_email, update_user_by_email, get_all_users
 from auth.dependencies import get_current_user, check_user_status
+from db.crud.users import get_user_by_email, update_user_by_email, get_all_users
 from user.schemas import UserInfo, UpdateUserInfo
 from utils import convert_sqlalchemy_row_to_dict, common_error_handler_decorator
 

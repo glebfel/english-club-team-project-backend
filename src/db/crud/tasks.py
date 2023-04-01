@@ -4,8 +4,8 @@ import pytz as pytz
 from sqlalchemy import and_
 from sqlalchemy.exc import NoResultFound
 
-from db.crud.users import get_user_by_email, check_user_exist_decorator
 from db.connector import get_db
+from db.crud.users import check_user_exist_decorator
 from db.models import Task, TaskResponse, User
 from exceptions import DatabaseElementNotFoundError
 
@@ -124,7 +124,7 @@ def submit_task(user_email: str, task_id: int, task_answer: str):
             session.commit()
     except NoResultFound:
         raise DatabaseElementNotFoundError(
-            'Task response to task with id={0} and user with id={1} not found'.format(task_id, user_id))
+            'Task response to task with id={0} and user with email={1} not found'.format(task_id, user_email))
 
 
 @check_task_response_exist_decorator
