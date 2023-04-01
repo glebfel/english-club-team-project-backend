@@ -5,6 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from db.crud.users import get_user_by_email
 from config import settings
 from user.schemas import UserInfo
+from utils import convert_sqlalchemy_row_to_dict
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", scheme_name="JWT")
 
@@ -26,8 +27,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserInfo:
             headers={"WWW-Authenticate": "Bearer"},
         )
     user = get_user_by_email(email)
-    return UserInfo(id=user.id, first_name=user.first_name, last_name=user.last_name, email=user.email,
-                    username=user.username, is_admin=user.is_admin, registered_at=user.registered_at)
+    return UserInfo(**convert_sqlalchemy_row_to_dict(user))
 
 
 async def check_user_status(user: UserInfo = Depends(get_current_user)):
