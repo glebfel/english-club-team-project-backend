@@ -141,7 +141,11 @@ def check_task(task_response_id: int):
             # update user scores
             task_response = task_response_query.first()
             task = session.query(Task).filter_by(id=task_response.task_id).first()
-            session.query(User).filter_by(id=task_response.user_id).update({'points': User.points + task.points})
+            # query for user
+            user_query = session.query(User).filter_by(email=task_response.user_email)
+            # get user
+            user_points = user_query.first().points + task.points
+            user_query.update({'points': user_points})
             session.commit()
     except NoResultFound:
         raise DatabaseElementNotFoundError(
