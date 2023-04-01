@@ -125,6 +125,7 @@ def submit_task(user_email: str, task_id: int, task_answer: str):
                 and_(TaskResponse.task_id == task_id, TaskResponse.user_email == user_email)).update(
                 {'is_completed': True,
                  'answer': task_answer})
+            session.commit()
     except NoResultFound:
         raise DatabaseElementNotFoundError(
             'Task response to task with id={0} and user with email={1} not found'.format(task_id, user_email))
