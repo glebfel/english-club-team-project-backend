@@ -116,12 +116,16 @@ def approve_task_response(task_response_id: int):
 def submit_task(user_email: str, task_id: int, task_answer: str):
     try:
         with get_db() as session:
+            user = session.query(User).filter_by(email=user_email).first()
+            task = session.query(Task).filter_by(id=task_id).first()
+            user.tasks.append(task)
+            session.commit()
+            session.refresh(task)
             # update completed status
             session.query(TaskResponse).filter(
                 and_(TaskResponse.task_id == task_id, TaskResponse.user_email == user_email)).update(
                 {'is_completed': True,
                  'answer': task_answer})
-            session.commit()
     except NoResultFound:
         raise DatabaseElementNotFoundError(
             'Task response to task with id={0} and user with email={1} not found'.format(task_id, user_email))
